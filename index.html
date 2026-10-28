@@ -152,6 +152,15 @@ try{DATA=JSON.parse(document.getElementById('snap').textContent)}catch(e){DATA={
 const $=id=>document.getElementById(id);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LSN='fo_dash_';
+const DTP={'JS-Dhablania-01689':'50504','TP-Ramadoss-01671':'48537','BC-Beth-01692':'51385','NG-Koh-01734':'52876','MS-Alexander-01737':'52962','GC-Brazier-01687':'51619','GC-Yong-01472':'50991'};
+function dtLink(e){const t=e.title||'';for(const k in DTP){if(t.indexOf(k)>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Project&RedirectToId='+DTP[k]+'" target="_blank" rel="noopener">[OPEN PROJECT]</a>'}if(t.indexOf('(D-Tools)')>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Schedule&RedirectToId='+(e.date||'')+'" target="_blank" rel="noopener">[OPEN D-TOOLS]</a>';return ''}
+function timeOpts(){let h='';for(let i=6;i<=21;i++){for(const m of ['00','30']){const hh=i>12?i-12:i;h+='<option value="'+String(i).padStart(2,'0')+':'+m+'">'+hh+':'+m+' '+(i<12?'AM':'PM')+'</option>'}}return h+'<option value="22:00">10:00 PM</option>'}
+function openAddEv(){$('evmodal').style.display='flex';$('evdate').value=sel||iso(new Date());$('evstart').innerHTML=timeOpts();$('evend').innerHTML=timeOpts();$('evstart').value='09:00';$('evend').value='10:00';$('evp').innerHTML='<option value="">(no project)</option>'+Object.keys(DTP).map(k=>'<option>'+k+'</option>').join('');$('evstat').textContent='';$('evname').value='';$('evloc').value='';$('evatt').value=''}
+function closeAddEv(){$('evmodal').style.display='none'}
+function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').value,start=$('evstart').value,end=$('evend').value,loc=$('evloc').value.trim(),att=$('evatt').value.trim(),proj=$('evp').value;if(!name||!date||!start||!end){$('evstat').textContent='NAME, DATE, START AND END REQUIRED';return}
+const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,project:proj,ts:Date.now(),status:'new'};
+if(fb){fb.child('dtools_events').push(rec);$('evstat').textContent='SENT TO FO. WILL BE IN D-TOOLS AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
+
 /* storage: firebase when configured, else localStorage */
 function fbInit(){
   if(!FB_CONFIG)return;
@@ -213,14 +222,6 @@ function renderMem(){
 }
 function addMem(){const v=$('memin').value.trim();if(!v)return;const list=getMem();list.push({id:'u'+Date.now(),cat:$('memcat').value,text:v});setMem(list);$('memin').value='';renderMem()}
 function delMem(id){setMem(getMem().filter(m=>m.id!==id));renderMem()}
-const DTP={'JS-Dhablania-01689':'50504','TP-Ramadoss-01671':'48537','BC-Beth-01692':'51385','NG-Koh-01734':'52876','MS-Alexander-01737':'52962','GC-Brazier-01687':'51619','GC-Yong-01472':'50991'};
-function dtLink(e){const t=e.title||'';for(const k in DTP){if(t.indexOf(k)>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Project&RedirectToId='+DTP[k]+'" target="_blank" rel="noopener">[OPEN PROJECT]</a>'}if(t.indexOf('(D-Tools)')>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Schedule&RedirectToId='+(e.date||'')+'" target="_blank" rel="noopener">[OPEN D-TOOLS]</a>';return ''}
-function timeOpts(){let h='';for(let i=6;i<=21;i++){for(const m of ['00','30']){const hh=i>12?i-12:i;h+='<option value="'+String(i).padStart(2,'0')+':'+m+'">'+hh+':'+m+' '+(i<12?'AM':'PM')+'</option>'}}return h+'<option value="22:00">10:00 PM</option>'}
-function openAddEv(){$('evmodal').style.display='flex';$('evdate').value=sel||iso(new Date());$('evstart').innerHTML=timeOpts();$('evend').innerHTML=timeOpts();$('evstart').value='09:00';$('evend').value='10:00';$('evp').innerHTML='<option value="">(no project)</option>'+Object.keys(DTP).map(k=>'<option>'+k+'</option>').join('');$('evstat').textContent='';$('evname').value='';$('evloc').value='';$('evatt').value=''}
-function closeAddEv(){$('evmodal').style.display='none'}
-function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').value,start=$('evstart').value,end=$('evend').value,loc=$('evloc').value.trim(),att=$('evatt').value.trim(),proj=$('evp').value;if(!name||!date||!start||!end){$('evstat').textContent='NAME, DATE, START AND END REQUIRED';return}
-const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,project:proj,ts:Date.now(),status:'new'};
-if(fb){fb.child('dtools_events').push(rec);$('evstat').textContent='SENT TO FO. WILL BE IN D-TOOLS AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
 let chatRef=null,chatData={};
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
 function sendChat(){const v=$('chatin').value.trim();if(!v)return;if(!chatRef){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef.push({from:'you',text:v.slice(0,500),ts:Date.now()});$('chatin').value=''}
