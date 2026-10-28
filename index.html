@@ -160,7 +160,7 @@ function renderCal(){
     h.push('<div class="'+cls+'" onclick="sel=\''+ds+'\';renderCal();renderDay()"><div class="dnum">'+d+'</div><div>'+dots+'</div></div>')}
   $('cgrid').innerHTML=h.join('');
 }
-function renderDay(){
+function renderDay(){if(!sel)return;
   const evs=(DATA.calendar||[]).filter(e=>e.date===sel);
   const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(sel+'T12:00').getDay()];
   $('daylist').innerHTML='<b style="color:var(--yellow)">'+wd+' '+sel.slice(5)+'</b>'+(evs.length?'':' <span style="color:var(--dim)">- nothing scheduled</span>')+evs.map(e=>'<div class="ev"><span class="tm '+e.cat[0]+'">'+esc(e.time)+'</span><span>'+esc(e.title)+'</span></div>').join('');
