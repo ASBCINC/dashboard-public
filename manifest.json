@@ -2,15 +2,30 @@
   "name": "Anthony's Dashboard",
   "short_name": "FO DASH",
   "description": "Fo's dashboard: tasks, calendar, highlights, chat",
-  "start_url": "/?source=pwa",
-  "scope": "/",
+  "start_url": "./?source=pwa",
+  "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#140a26",
   "theme_color": "#140a26",
   "icons": [
-    {"src": "/icons/192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "/icons/512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {
+      "src": "icons/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

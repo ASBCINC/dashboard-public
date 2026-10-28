@@ -96,10 +96,10 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 @keyframes bscroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
 @keyframes bblink{50%{opacity:.25}}
 </style>
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#140a26">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" href="/icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/favicon.png">
 </head>
 <body>
 <div id="gate">
@@ -201,7 +201,7 @@ let deferPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferPrompt=e;const b=$('installbtn');if(b)b.style.display='inline-block'});
 window.addEventListener('appinstalled',()=>{deferPrompt=null;const b=$('installbtn');if(b)b.style.display='none'});
 function installApp(){if(deferPrompt){deferPrompt.prompt();deferPrompt=null}else{const b=$('installbtn');if(b)b.style.display='none'}}
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 /* pin */
 if(localStorage.getItem(LSN+'pin')===PIN){pin=PIN;unlock()}else{$('pinin').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin()})}
 function tryPin(){if($('pinin').value===PIN){pin=$('pinin').value;localStorage.setItem(LSN+'pin',PIN);unlock()}else{$('.ge').textContent='WRONG PIN';$('pinin').value=''}}
