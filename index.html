@@ -48,6 +48,12 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .titem.done .ttitle{text-decoration:line-through;color:var(--dim)}
 .tdetail{color:var(--dim);font-size:16px}
 .tdue{color:var(--yellow);font-size:16px;white-space:nowrap}
+/* chat */
+.chatlog{max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px}
+.msg{max-width:82%;padding:6px 10px;border:2px solid;font-size:19px;line-height:1.25;word-break:break-word}
+.msg.you{align-self:flex-end;border-color:var(--pink);background:#2a0f22}
+.msg.fo{align-self:flex-start;border-color:var(--cyan);background:#0c2430}
+.msg .who{font-family:'Press Start 2P';font-size:8px;display:block;margin-bottom:3px;color:var(--dim)}
 /* memorable */
 .mem{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #4a2f8a}
 .mem:last-child{border-bottom:none}
@@ -96,6 +102,14 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   </div>
 
   <div class="panel">
+    <div class="ph"><span>CHAT WITH FO</span><span id="chatnote" style="font-size:9px">FO REPLIES WITHIN ~15 MIN</span></div>
+    <div class="pb">
+      <div id="chatlog" class="chatlog"></div>
+      <div class="addrow"><input class="addt" id="chatin" placeholder="message fo..." onkeydown="if(event.key==='Enter')sendChat()"><button class="addb" onclick="sendChat()">SEND</button></div>
+    </div>
+  </div>
+
+  <div class="panel">
     <div class="ph"><span>MEMORABLE ITEMS</span></div>
     <div class="pb">
       <div id="mems"></div>
@@ -121,7 +135,7 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e))}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e))}chatInit()}catch(e){console.warn(e)}}
 }
 function seedMem(){const m=DATA.memorable||[];return m.length?m:null}
 function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}catch(e){return[]}}
@@ -171,13 +185,27 @@ function renderTasks(){
   mk((DATA.tasks||[]).filter(t=>t.cat==='work'),'wtasks');
   mk((DATA.tasks||[]).filter(t=>t.cat==='personal'),'ptasks');
 }
+/* chat */
+.chatlog{max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px}
+.msg{max-width:82%;padding:6px 10px;border:2px solid;font-size:19px;line-height:1.25;word-break:break-word}
+.msg.you{align-self:flex-end;border-color:var(--pink);background:#2a0f22}
+.msg.fo{align-self:flex-start;border-color:var(--cyan);background:#0c2430}
+.msg .who{font-family:'Press Start 2P';font-size:8px;display:block;margin-bottom:3px;color:var(--dim)}
 /* memorable */
 function renderMem(){
   $('mems').innerHTML=getMem().map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+m.cat[0]+'">'+esc(m.text)+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
 }
 function addMem(){const v=$('memin').value.trim();if(!v)return;const list=getMem();list.push({id:'u'+Date.now(),cat:$('memcat').value,text:v});setMem(list);$('memin').value='';renderMem()}
 function delMem(id){setMem(getMem().filter(m=>m.id!==id));renderMem()}
-function render(){renderCal();renderDay();renderTasks();renderMem();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
+let chatRef=null,chatData={};
+function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
+function sendChat(){const v=$('chatin').value.trim();if(!v)return;if(!chatRef){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef.push({from:'you',text:v.slice(0,500),ts:Date.now()});$('chatin').value=''}
+function renderChat(){
+  const ks=Object.keys(chatData).sort((a,b)=>(chatData[a].ts||0)-(chatData[b].ts||0)).slice(-40);
+  $('chatlog').innerHTML=ks.map(k=>{const m=chatData[k];return '<div class="msg '+(m.from==='fo'?'fo':'you')+'"><span class="who">'+(m.from==='fo'?'FO':'YOU')+'</span>'+esc(m.text)+'</div>'}).join('');
+  const el=$('chatlog');el.scrollTop=el.scrollHeight;
+}
+function render(){renderCal();renderDay();renderTasks();renderMem();renderChat();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
 render();
 </script>
 </body>
