@@ -70,7 +70,7 @@ input.pin:focus,input.addt:focus{outline:2px solid var(--yellow)}
 #gate{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #gate .gt{font-family:'Press Start 2P';font-size:16px;color:var(--pink);text-shadow:2px 2px 0 var(--cyan)}
 #gate .ge{font-family:'Press Start 2P';font-size:10px;color:var(--yellow)}
-#gate input{width:150px;text-align:center;font-size:28px;letter-spacing:8px}
+#gate input{width:104px;text-align:center;font-size:26px;letter-spacing:6px}
 #gate button{margin-top:6px}
 #stamp{color:var(--dim);text-align:center;font-size:16px}
 footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:center;margin-top:26px}
@@ -82,7 +82,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 <div id="gate">
   <div class="gt">ANTHONY'S DASHBOARD</div>
   <div class="ge">ENTER PIN</div>
-  <input class="pin" id="pinin" type="password" inputmode="numeric" maxlength="8" autofocus>
+  <input class="pin" id="pinin" type="password" inputmode="numeric" maxlength="4" autofocus>
   <button class="addb" onclick="tryPin()">START</button>
 </div>
 <div class="wrap" id="app" hidden>
