@@ -153,6 +153,7 @@ try{DATA=JSON.parse(document.getElementById('snap').textContent)}catch(e){DATA={
 const $=id=>document.getElementById(id);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LSN='fo_dash_';
+let chatRef=null,chatData={};
 const DTP={'JS-Dhablania-01689':'50504','TP-Ramadoss-01671':'48537','BC-Beth-01692':'51385','NG-Koh-01734':'52876','MS-Alexander-01737':'52962','GC-Brazier-01687':'51619','GC-Yong-01472':'50991'};
 function dtLink(e){const t=e.title||'';for(const k in DTP){if(t.indexOf(k)>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Project&RedirectToId='+DTP[k]+'" target="_blank" rel="noopener">[OPEN PROJECT]</a>'}if(t.indexOf('(D-Tools)')>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Schedule&RedirectToId='+(e.date||'')+'" target="_blank" rel="noopener">[OPEN D-TOOLS]</a>';return ''}
 const HOLIDS=["new year","martin luther king","mlk day","presidents day","washington's birthday","memorial day","juneteenth","independence day","labor day","columbus day","indigenous peoples","veterans day","thanksgiving","christmas","halloween","valentine","st. patrick","easter","mother's day","father's day","daylight saving time","election day","inauguration day","good friday","passover","hanukkah","yom kippur","rosh hashanah","kwanzaa","earth day","april fools","casimir pulaski","cesar chavez","mardi gras","cinco de mayo","flag day","juneteenth"];
@@ -225,7 +226,6 @@ function renderMem(){
 }
 function addMem(){const v=$('memin').value.trim();if(!v)return;const list=getMem();list.push({id:'u'+Date.now(),cat:$('memcat').value,text:v});setMem(list);$('memin').value='';renderMem()}
 function delMem(id){setMem(getMem().filter(m=>m.id!==id));renderMem()}
-let chatRef=null,chatData={};
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
 function sendChat(){const v=$('chatin').value.trim();if(!v)return;if(!chatRef){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef.push({from:'you',text:v.slice(0,500),ts:Date.now()});$('chatin').value=''}
 function renderChat(){
