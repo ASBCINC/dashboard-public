@@ -208,7 +208,7 @@ function seedMem(){const m=DATA.memorable||[];return m.length?m:null}
 function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}catch(e){return[]}}
 function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb)fb.child('mem').set(list)}
 function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
-function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb)fb.child('done').child(String(n)).set(v?true:null);render()}
+function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb){fb.child('done').child(String(n)).set(v?true:null);if(v){const t=(DATA.tasks||[]).find(x=>x.n===n);fb.child('task_done').push({n:n,url:(t&&t.url)||'',title:(t&&t.title)||'',ts:Date.now()})}}render()}
 /* banner */
 function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *'}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
 /* pwa install + service worker */
@@ -257,8 +257,8 @@ function renderDay(){if(!sel)return;
 /* tasks */
 function renderTasks(){
   const mk=(list,el)=>{$(el).innerHTML=list.length?list.map(x=>'<div class="titem'+(isDone(x.n)?' done':'')+'"><div class="pxbox'+(isDone(x.n)?' on':'')+'" onclick="setDone('+x.n+','+!isDone(x.n)+')"></div><div class="tt"><div class="ttitle">'+esc(x.title)+'</div>'+(x.detail?'<div class="tdetail">'+esc(x.detail)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>').join(''):'<div class="tdetail">nothing here.</div>'};
-  mk((DATA.tasks||[]).filter(t=>t.cat==='work'),'wtasks');
-  mk((DATA.tasks||[]).filter(t=>t.cat==='personal'),'ptasks');
+  mk((DATA.tasks||[]).filter(t=>t.cat==='work'&&!isDone(t.n)),'wtasks');
+  mk((DATA.tasks||[]).filter(t=>t.cat==='personal'&&!isDone(t.n)),'ptasks');
 }
 /* memorable */
 function renderMem(){
