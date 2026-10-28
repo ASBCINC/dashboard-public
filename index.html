@@ -136,14 +136,6 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   </div>
 
   <div class="panel">
-    <div class="ph"><span>CHAT WITH FO</span><span id="chatnote" style="font-size:9px">FO REPLIES WITHIN ~15 MIN</span></div>
-    <div class="pb">
-      <div id="chatlog" class="chatlog"></div>
-      <div class="addrow"><input class="addt" id="chatin" placeholder="message fo..." onkeydown="if(event.key==='Enter')sendChat()"><button class="addb" onclick="sendChat()">SEND</button></div>
-    </div>
-  </div>
-
-  <div class="panel">
     <div class="ph"><span>HIGHLIGHTS</span></div>
     <div class="pb">
       <div id="mems"></div>
@@ -157,13 +149,6 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
       <div id="rampfunds"></div>
       <div class="rsub">OPEN EXPENSES</div>
       <div id="rampbills"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="ph"><span>EXPENSES DUE</span><span id="ebnote" style="font-size:9px"></span></div>
-    <div class="pb">
-      <div id="expbills"></div>
     </div>
   </div>
 
@@ -229,7 +214,7 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));chatInit()}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e))}catch(e){console.warn(e)}}
 }
 function seedMem(){const m=DATA.memorable||[];return m.length?m:null}
 function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}catch(e){return[]}}
@@ -310,7 +295,7 @@ function renderRamp(){
   $('rampnote').textContent='LIMITS LIVE FROM RAMP';
 }
 function renderBills(){const bl=(DATA.bills||[]);const eb=$('expbills');if(!eb)return;eb.innerHTML=bl.length?bl.map(b=>'<div class="rbill"><span>'+esc(b.name)+' &middot; '+esc(b.due||'')+'</span><span>'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>').join(''):'<div class="tdetail">nothing due</div>'}
-function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();renderBills();renderTminus();renderChat();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
+function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();renderTminus();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
 render();
 </script>
 </body>
