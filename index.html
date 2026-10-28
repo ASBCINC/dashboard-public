@@ -84,6 +84,17 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 .evform{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .evform input,.evform select{width:100%;background:#0d0620;color:var(--text);border:2px solid var(--cyan);font:18px 'VT323',monospace;padding:6px 8px}
 .evrow{display:flex;gap:8px}.evrow>*{flex:1}
+
+/* alert banner */
+#banner{display:flex;align-items:center;background:#1a0a14;border-top:2px solid var(--pink);border-bottom:2px solid var(--pink);padding:3px 10px;gap:10px;min-height:26px;overflow:hidden}
+#banner .btag{font-family:'Press Start 2P';font-size:8px;color:#fff;background:var(--pink);padding:3px 6px;flex:none;animation:bblink 1s steps(1) infinite}
+#banner .btrack{flex:1;overflow:hidden;white-space:nowrap}
+#banner .btext{display:inline-block;font-family:'VT323',monospace;font-size:16px;color:var(--yellow);letter-spacing:1px;animation:bscroll 18s linear infinite}
+#banner.idle{border-color:rgba(45,226,230,.4)}
+#banner.idle .btag{background:var(--cyan);color:#000;animation:none}
+#banner.idle .btext{color:var(--dim);animation:bscroll 26s linear infinite}
+@keyframes bscroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+@keyframes bblink{50%{opacity:.25}}
 </style>
 </head>
 <body>
@@ -94,6 +105,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   <button class="addb" onclick="tryPin()">START</button>
 </div>
 <div class="wrap" id="app" hidden>
+<div id="banner"><span class="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div></div></div>
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
 
@@ -177,10 +189,12 @@ function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}cat
 function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb)fb.child('mem').set(list)}
 function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
 function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb)fb.child('done').child(String(n)).set(v?true:null);render()}
+/* banner */
+function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *'}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
 /* pin */
 if(localStorage.getItem(LSN+'pin')===PIN){pin=PIN;unlock()}else{$('pinin').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin()})}
 function tryPin(){if($('pinin').value===PIN){pin=$('pinin').value;localStorage.setItem(LSN+'pin',PIN);unlock()}else{$('.ge').textContent='WRONG PIN';$('pinin').value=''}}
-function unlock(){$('gate').style.display='none';$('app').hidden=false;const n=new Date();view={y:n.getFullYear(),m:n.getMonth()};sel=iso(n);render();fetchData();fbInit()}
+function unlock(){$('gate').style.display='none';$('app').hidden=false;const n=new Date();view={y:n.getFullYear(),m:n.getMonth()};sel=iso(n);render();renderBanner();fetchData();fbInit()}
 /* data */
 async function fetchData(){
   try{
@@ -190,7 +204,7 @@ async function fetchData(){
     const f=j.files&&(j.files['data.json']||Object.values(j.files)[0]);
     if(f&&f.content){DATA=JSON.parse(f.content);
       if(fb&&!localStorage.getItem(LSN+'memseeded')){fb.child('mem').get().then(s=>{if(s.val()==null)fb.child('mem').set(seedMem())});localStorage.setItem(LSN+'memseeded','1')}
-      render()}
+      render();renderBanner()}
   }catch(e){$('calnote').textContent='OFFLINE SNAP'}
 }
 /* calendar */
