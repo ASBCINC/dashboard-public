@@ -121,7 +121,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   <div id="tminus"></div>
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
-  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button class="addb" id="installbtn" style="display:none" onclick="installApp()">INSTALL APP</button></div>
+  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button class="addb" id="installbtn" style="display:none" onclick="installApp()">INSTALL APP</button></div>
 
   <div class="panel">
     <div class="ph"><span>CALENDAR</span><span id="calnote" style="font-size:9px"></span></div>
@@ -209,6 +209,13 @@ function nextTargets(){const out=[];const now=new Date();(DATA.bills||[]).forEac
 function renderTminus(){const el=$('tminus');if(!el)return;const ts=nextTargets();el.innerHTML=ts.map(t=>{const ms=t.d-Date.now();if(ms<=0)return '';const dd=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5),mm=Math.floor(ms%36e5/6e4),ss=Math.floor(ms%6e4/1e3);const z=x=>String(x).padStart(2,'0');return '<div class="trow"><span>'+esc(t.label)+'</span><span class="tval">T-'+dd+'D '+z(hh)+':'+z(mm)+':'+z(ss)+'</span></div>'}).join('')}
 setInterval(renderTminus,1000);
 function saveNote(){const v=$('notein').value.trim();if(!v)return;if(!fb){$('notenote').textContent='NEEDS FIREBASE';return}fb.child('notes').push({text:v.slice(0,500),ts:Date.now()});$('notein').value='';$('notenote').textContent='SENT TO FO';setTimeout(()=>{const n=$('notenote');if(n)n.textContent=''},4000)}
+/* PUSH NOTIFY (added Oct 27 2026) */
+const VAPID_PUB='BBuzCk2pHlJYrXGqxPjLfKq9rnGIQsGFGTGZ5aN_0YqcXHNrn7YGzx_LlY6JiDo4AtUjhzm6DGDJRXah0I_O4U4';
+let pushSub=null;
+function u8(s){const p='='.repeat((4-s.length%4)%4);const b=(s+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(b);return Uint8Array.from(r,c=>c.charCodeAt(0))}
+async function initNotify(){try{if(!('serviceWorker'in navigator)||!('PushManager'in window)){const b=$('notifybtn');if(b)b.textContent='NO PUSH';return}const reg=await navigator.serviceWorker.ready;pushSub=await reg.pushManager.getSubscription();const b=$('notifybtn');if(b)b.textContent=pushSub?'NOTIFY OFF':'NOTIFY ON'}catch(e){}}
+async function toggleNotify(){sfx();try{const reg=await navigator.serviceWorker.ready;if(pushSub){await pushSub.unsubscribe();pushSub=null;$('notifybtn').textContent='NOTIFY ON';return}const perm=await Notification.requestPermission();if(perm!=='granted'){$('notifybtn').textContent='BLOCKED';return}pushSub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUB)});if(fb)fb.child('push_subs').push(pushSub.toJSON());$('notifybtn').textContent='NOTIFY OFF'}catch(e){$('notifybtn').textContent='NOTIFY ON'}}
+initNotify();
 /* storage: firebase when configured, else localStorage */
 function fbInit(){
   if(!FB_CONFIG)return;
