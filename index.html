@@ -110,7 +110,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 <script>
 const GIST='246c532c1031a57b4d3642e339998e6f';
 const PIN='4762';                 // change your PIN here
-const FB_CONFIG=null;             // paste your Firebase web config object here to sync across devices
+const FB_CONFIG={apiKey:"AIzaSyCSf560VkBf2esIH5rC-_Vcx349o7iIC-0",authDomain:"asbc-calculator.firebaseapp.com",databaseURL:"https://asbc-calculator-default-rtdb.firebaseio.com",projectId:"asbc-calculator",storageBucket:"asbc-calculator.firebasestorage.app",messagingSenderId:"1060301879727",appId:"1:1060301879727:web:3eb390503974dc60ea175a",measurementId:"G-DX5YVKK5RR"}; // asbc-calculator web app, syncs check-offs + memorable across devices
 let DATA,pin='',fb=null,view={y:0,m:0},sel=null;
 try{DATA=JSON.parse(document.getElementById('snap').textContent)}catch(e){DATA={tasks:[],calendar:[],memorable:[]}}
 const $=id=>document.getElementById(id);
@@ -121,7 +121,7 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(LSN+'done_'+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(LSN+'done_')&&v[k.slice(LSN.length+5)]===undefined&&v[k.slice(10)]===undefined)localStorage.removeItem(k);render()});fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}})}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e))}catch(e){console.warn(e)}}
 }
 function seedMem(){const m=DATA.memorable||[];return m.length?m:null}
 function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}catch(e){return[]}}
@@ -129,8 +129,8 @@ function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb
 function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
 function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb)fb.child('done').child(String(n)).set(v?true:null);render()}
 /* pin */
-if(localStorage.getItem(LSN+'pin')===PIN){unlock()}else{$('pinin').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin()})}
-function tryPin(){if($('pinin').value===PIN){localStorage.setItem(LSN+'pin',PIN);unlock()}else{$('.ge').textContent='WRONG PIN';$('pinin').value=''}}
+if(localStorage.getItem(LSN+'pin')===PIN){pin=PIN;unlock()}else{$('pinin').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin()})}
+function tryPin(){if($('pinin').value===PIN){pin=$('pinin').value;localStorage.setItem(LSN+'pin',PIN);unlock()}else{$('.ge').textContent='WRONG PIN';$('pinin').value=''}}
 function unlock(){$('gate').style.display='none';$('app').hidden=false;const n=new Date();view={y:n.getFullYear(),m:n.getMonth()};sel=iso(n);render();fetchData();fbInit()}
 /* data */
 async function fetchData(){
