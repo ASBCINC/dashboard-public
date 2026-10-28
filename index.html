@@ -101,6 +101,8 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 .rfill{height:100%}
 .rsub{font-family:'Press Start 2P';font-size:9px;color:var(--yellow);margin:14px 0 4px}
 .rbill{display:flex;justify-content:space-between;font-size:19px;padding:2px 0;border-bottom:1px solid rgba(156,143,199,.2)}
+.trow{display:flex;justify-content:space-between;font-family:'Press Start 2P';font-size:10px;color:var(--cyan);padding:3px 0;border-bottom:1px solid rgba(156,143,199,.2)}
+.tval{color:var(--yellow)}
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#140a26">
@@ -116,6 +118,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 </div>
 <div class="wrap" id="app" hidden>
 <div id="banner"><span class="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div></div></div>
+  <div id="tminus"></div>
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
   <div style="text-align:center;margin-bottom:14px"><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button class="addb" id="installbtn" style="display:none" onclick="installApp()">INSTALL APP</button></div>
@@ -164,6 +167,13 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
     </div>
   </div>
 
+  <div class="panel">
+    <div class="ph"><span>QUICK NOTE</span><span id="notenote" style="font-size:9px"></span></div>
+    <div class="pb">
+      <div class="addrow"><input class="addt" id="notein" placeholder="type a note for fo..." onkeydown="if(event.key==='Enter')saveNote()"><button class="addb" onclick="saveNote()">SAVE</button></div>
+    </div>
+  </div>
+
   <div id="evmodal" onclick="if(event.target===this)closeAddEv()">
   <div class="evbox">
     <div class="ph" style="color:var(--yellow);border-color:var(--yellow)"><span>ADD D-TOOLS EVENT</span><span class="x" style="cursor:pointer" onclick="closeAddEv()">X</span></div>
@@ -204,6 +214,16 @@ function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').valu
 const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,project:proj,ts:Date.now(),status:'new'};
 if(fb){fb.child('dtools_events').push(rec);$('evstat').textContent='SENT TO FO. WILL BE IN D-TOOLS AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
 
+/* SFX + T-MINUS + QUICK NOTE (added Oct 27 2026) */
+let actx=null;
+function sfx(f){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type='square';o.frequency.value=f||880;g.gain.value=.04;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+.07)}catch(e){}}
+document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('button'))sfx()});
+const MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function parseBillDue(s){const m=/([A-Za-z]{3})\s+(\d{1,2})/.exec(s||'');if(!m)return null;const mo=MONTHS[m[1].toLowerCase()];if(mo==null)return null;const n=new Date();const y=n.getFullYear();let d=new Date(y,mo,+m[2],17,0,0);if(d<=n)d=new Date(y+1,mo,+m[2],17,0,0);return d}
+function nextTargets(){const out=[];const now=new Date();(DATA.bills||[]).forEach(b=>{const d=parseBillDue(b.due||'');if(d)out.push({label:b.name,d})});(DATA.calendar||[]).forEach(e=>{if(e.cat==='holiday'||!e.date)return;const p=e.date.split('-');if(p.length<3||isNaN(+p[0]))return;const d=new Date(+p[0],+p[1]-1,+p[2],9,0,0);if(d>now)out.push({label:e.title||'event',d})});out.sort((a,b)=>a.d-b.d);return out.slice(0,3)}
+function renderTminus(){const el=$('tminus');if(!el)return;const ts=nextTargets();el.innerHTML=ts.map(t=>{const ms=t.d-Date.now();if(ms<=0)return '';const dd=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5),mm=Math.floor(ms%36e5/6e4),ss=Math.floor(ms%6e4/1e3);const z=x=>String(x).padStart(2,'0');return '<div class="trow"><span>'+esc(t.label)+'</span><span class="tval">T-'+dd+'D '+z(hh)+':'+z(mm)+':'+z(ss)+'</span></div>'}).join('')}
+setInterval(renderTminus,1000);
+function saveNote(){const v=$('notein').value.trim();if(!v)return;if(!fb){$('notenote').textContent='NEEDS FIREBASE';return}fb.child('notes').push({text:v.slice(0,500),ts:Date.now()});$('notein').value='';$('notenote').textContent='SENT TO FO';setTimeout(()=>{const n=$('notenote');if(n)n.textContent=''},4000)}
 /* storage: firebase when configured, else localStorage */
 function fbInit(){
   if(!FB_CONFIG)return;
@@ -290,7 +310,7 @@ function renderRamp(){
   $('rampnote').textContent='LIMITS LIVE FROM RAMP';
 }
 function renderBills(){const bl=(DATA.bills||[]);const eb=$('expbills');if(!eb)return;eb.innerHTML=bl.length?bl.map(b=>'<div class="rbill"><span>'+esc(b.name)+' &middot; '+esc(b.due||'')+'</span><span>'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>').join(''):'<div class="tdetail">nothing due</div>'}
-function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();renderBills();renderChat();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
+function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();renderBills();renderTminus();renderChat();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
 render();
 </script>
 </body>
