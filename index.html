@@ -96,6 +96,10 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 @keyframes bscroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
 @keyframes bblink{50%{opacity:.25}}
 </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#140a26">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icons/favicon.png">
 </head>
 <body>
 <div id="gate">
@@ -108,6 +112,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 <div id="banner"><span class="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div></div></div>
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
+  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="installbtn" style="display:none" onclick="installApp()">INSTALL APP</button></div>
 
   <div class="panel">
     <div class="ph"><span>CALENDAR</span><span id="calnote" style="font-size:9px"></span></div>
@@ -191,6 +196,12 @@ function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
 function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb)fb.child('done').child(String(n)).set(v?true:null);render()}
 /* banner */
 function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *'}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
+/* pwa install + service worker */
+let deferPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferPrompt=e;const b=$('installbtn');if(b)b.style.display='inline-block'});
+window.addEventListener('appinstalled',()=>{deferPrompt=null;const b=$('installbtn');if(b)b.style.display='none'});
+function installApp(){if(deferPrompt){deferPrompt.prompt();deferPrompt=null}else{const b=$('installbtn');if(b)b.style.display='none'}}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}
 /* pin */
 if(localStorage.getItem(LSN+'pin')===PIN){pin=PIN;unlock()}else{$('pinin').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin()})}
 function tryPin(){if($('pinin').value===PIN){pin=$('pinin').value;localStorage.setItem(LSN+'pin',PIN);unlock()}else{$('.ge').textContent='WRONG PIN';$('pinin').value=''}}
