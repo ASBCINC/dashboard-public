@@ -76,6 +76,13 @@ input.pin:focus,input.addt:focus{outline:2px solid var(--yellow)}
 footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:center;margin-top:26px}
 .blink{animation:bl 1s steps(1) infinite}
 @keyframes bl{50%{opacity:0}}
+.evlink{color:var(--yellow);font-size:15px;text-decoration:none;margin-left:6px}
+.evlink:hover{color:var(--green)}
+#evmodal{display:none;position:fixed;inset:0;background:rgba(8,3,20,.85);z-index:200;align-items:center;justify-content:center;padding:16px}
+.evbox{width:100%;max-width:520px;border:3px solid var(--yellow);background:var(--panel);box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--cyan)}
+.evform{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.evform input,.evform select{width:100%;background:#0d0620;color:var(--text);border:2px solid var(--cyan);font:18px 'VT323',monospace;padding:6px 8px}
+.evrow{display:flex;gap:8px}.evrow>*{flex:1}
 </style>
 </head>
 <body>
@@ -91,7 +98,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 
   <div class="panel">
     <div class="ph"><span>CALENDAR</span><span id="calnote" style="font-size:9px"></span></div>
-    <div class="calhead"><button class="navb" onclick="mv(-1)">&#9664;</button><div class="mtitle" id="mtitle"></div><button class="navb" onclick="mv(1)">&#9654;</button></div>
+    <div class="calhead"><button class="navb" onclick="mv(-1)">&#9664;</button><div class="mtitle" id="mtitle"></div><button class="navb" onclick="mv(1)">&#9654;</button><button class="navb" style="font-size:9px;padding:6px 8px" onclick="openAddEv()">+ ADD EVENT</button></div>
     <div class="grid" id="cgrid"></div>
     <div class="daylist" id="daylist"></div>
   </div>
@@ -117,7 +124,22 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
     </div>
   </div>
 
-  <div id="stamp"></div>
+  <div id="evmodal" onclick="if(event.target===this)closeAddEv()">
+  <div class="evbox">
+    <div class="ph" style="color:var(--yellow);border-color:var(--yellow)"><span>ADD D-TOOLS EVENT</span><span class="x" style="cursor:pointer" onclick="closeAddEv()">X</span></div>
+    <div class="evform">
+      <input id="evname" placeholder="event name">
+      <div class="evrow"><input id="evdate" type="date"><select id="evstart"></select><select id="evend"></select></div>
+      <input id="evloc" placeholder="location">
+      <input id="evatt" placeholder="required attendees (comma separated)">
+      <select id="evp"></select>
+      <div class="evrow"><button class="addb" onclick="submitAddEv()">SUBMIT</button><button class="addb" onclick="closeAddEv()">CANCEL</button></div>
+      <div id="evstat" class="tdetail"></div>
+      <div class="tdetail" style="font-size:14px">SUBMITS TO FO. ENTERED INTO THE D-TOOLS CALENDAR ON THE NEXT SWEEP.</div>
+    </div>
+  </div>
+</div>
+<div id="stamp"></div>
   <footer>PRESS START <span class="blink">_</span> | POWERED BY FO</footer>
 </div>
 <script id="snap" type="application/json">{"generated_at": "2026-10-27T17:10:00-07:00", "tasks": [{"n": 1, "cat": "work", "title": "Verify approved change order, NS-Zabriskie-01666", "detail": "Noel Salinas: 2:08 PM check change order for revised SOW; 2:28 PM client approved.", "due": null, "url": "https://github.com/ASBCINC/dashboard/issues/1"}, {"n": 2, "cat": "work", "title": "Answer Josh Silva on Harmony install date (JS-Dhablania-01689)", "detail": "Harmony install now Mon Nov 9; floor stand stuck in Philly; inner covers arrive Fri Nov 6.", "due": "Wed Oct 28", "url": "https://github.com/ASBCINC/dashboard/issues/4"}, {"n": 3, "cat": "personal", "title": "Pay car insurance in USAA app", "detail": "Due Mon Nov 2. Last USAA payment Oct 18 was $400.71.", "due": "Mon Nov 2", "url": "https://github.com/ASBCINC/dashboard/issues/5"}, {"n": 4, "cat": "personal", "title": "Truck + mortgage payments", "detail": "Due Fri Nov 6.", "due": "Fri Nov 6", "url": "https://github.com/ASBCINC/dashboard/issues/3"}, {"n": 5, "cat": "personal", "title": "Decide Paramount+ renewal", "detail": "Price went up; next billing starts Nov 26. Keep or cancel by Nov 25.", "due": "Nov 25", "url": "https://github.com/ASBCINC/dashboard/issues/2"}, {"n": 6, "cat": "personal", "title": "Reset FTB e-Services password", "detail": "Expires Nov 26.", "due": "Nov 26", "url": "https://github.com/ASBCINC/dashboard/issues/6"}, {"n": 7, "cat": "personal", "title": "Sort out cancelled SAFE loan payment", "detail": "SAFE Credit Union 'Loan Payment Cancelled' email Oct 23.", "due": null, "url": "https://github.com/ASBCINC/dashboard/issues/7"}, {"n": 8, "cat": "personal", "title": "Check garage door sensor alerts", "detail": "Alarm.com unexpected-activity alerts Oct 26.", "due": null, "url": "https://github.com/ASBCINC/dashboard/issues/8"}], "calendar": [{"cat": "work", "date": "2026-10-27", "time": "All day", "title": "GC-Yong-01472 Finish (KeyDate) (D-Tools)"}, {"cat": "work", "date": "2026-10-28", "time": "All day", "title": "Move 90s (D-Tools)"}, {"cat": "work", "date": "2026-10-28", "time": "All day", "title": "ACTION: Expense Report DUE! (through Fri Oct 30)"}, {"cat": "work", "date": "2026-10-29", "time": "All day", "title": "SSF Warehouse pick up (D-Tools)"}, {"cat": "work", "date": "2026-10-29", "time": "All day", "title": "GC-Brazier-01687 [P-239] (D-Tools)"}, {"cat": "work", "date": "2026-10-30", "time": "11:00 AM", "title": "All ASBC Call (Teams)"}, {"cat": "work", "date": "2026-11-01", "time": "9:00 AM", "title": "Pick up 90's (D-Tools)"}, {"cat": "personal", "date": "2026-11-01", "time": "2:00 AM", "title": "Daylight Saving Time ends"}, {"cat": "personal", "date": "2026-11-02", "time": "12:30 PM", "title": "Car Insurance due"}, {"cat": "work", "date": "2026-11-03", "time": "9:00 AM", "title": "NG-Koh-01734 [P-320] install, 9-5 (D-Tools)"}, {"cat": "work", "date": "2026-11-04", "time": "All day", "title": "BC-Beth-01692 [P-216] (D-Tools)"}, {"cat": "work", "date": "2026-11-04", "time": "10:30 AM", "title": "D-Tools Cloud Training Session (Teams)"}, {"cat": "work", "date": "2026-11-05", "time": "9:00 AM", "title": "BC-Beth-01692 [P-216] install (D-Tools)"}, {"cat": "personal", "date": "2026-11-06", "time": "12:30 PM", "title": "Mortgage due"}, {"cat": "personal", "date": "2026-11-06", "time": "12:30 PM", "title": "Truck payment due"}, {"cat": "work", "date": "2026-11-06", "time": "11:00 AM", "title": "All ASBC Call + Project kickoff (Teams)"}, {"cat": "personal", "date": "2026-11-11", "time": "All day", "title": "Veterans Day"}, {"cat": "work", "date": "2026-11-09", "time": "All day", "title": "JS-Dhablania-01689 [P-106] Harmony install (D-Tools)"}, {"cat": "work", "date": "2026-11-13", "time": "11:00 AM", "title": "All ASBC Call (Teams)"}, {"cat": "work", "date": "2026-11-17", "time": "All day", "title": "TP-Ramadoss-01671 [P-22] (D-Tools)"}, {"cat": "work", "date": "2026-11-20", "time": "11:00 AM", "title": "All ASBC Call (Teams)"}, {"cat": "personal", "date": "2026-11-16", "time": "12:30 PM", "title": "GMC payment due"}, {"cat": "personal", "date": "2026-11-18", "time": "12:00 PM", "title": "AT&T Wireless due"}, {"cat": "personal", "date": "2026-11-21", "time": "12:30 PM", "title": "Bankruptcy payment (TFS)"}, {"cat": "personal", "date": "2026-11-22", "time": "All day", "title": "Water bill"}, {"cat": "work", "date": "2026-11-25", "time": "All day", "title": "Pay Day: Oct Commissions"}, {"cat": "work", "date": "2026-11-27", "time": "11:00 AM", "title": "All ASBC Call (Teams)"}, {"cat": "work", "date": "2026-11-28", "time": "All day", "title": "ACTION: Expense Report DUE! (through Mon Nov 30)"}], "memorable": [{"id": "m1", "cat": "personal", "text": "Set clocks back Sat night Nov 1 (DST ends)"}, {"id": "m2", "cat": "personal", "text": "Car insurance: pay in USAA app by Mon Nov 2"}, {"id": "m3", "cat": "personal", "text": "Truck + mortgage due Fri Nov 6"}, {"id": "m4", "cat": "work", "text": "Harmony install locked for Mon Nov 9; inner covers arrive Fri Nov 6"}, {"id": "m5", "cat": "personal", "text": "Paramount+ renewal: decide by Nov 25"}, {"id": "m6", "cat": "personal", "text": "FTB e-Services password expires Nov 26"}, {"id": "m7", "cat": "personal", "text": "TFS plan payment: $1,300 total must land by the 20th each month"}, {"id": "m8", "cat": "personal", "text": "Veterans Day Wed Nov 11"}]}</script>
@@ -177,7 +199,7 @@ function renderCal(){
 function renderDay(){if(!sel)return;
   const evs=(DATA.calendar||[]).filter(e=>e.date===sel);
   const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(sel+'T12:00').getDay()];
-  $('daylist').innerHTML='<b style="color:var(--yellow)">'+wd+' '+sel.slice(5)+'</b>'+(evs.length?'':' <span style="color:var(--dim)">- nothing scheduled</span>')+evs.map(e=>'<div class="ev"><span class="tm '+e.cat[0]+'">'+esc(e.time)+'</span><span>'+esc(e.title)+'</span></div>').join('');
+  $('daylist').innerHTML='<b style="color:var(--yellow)">'+wd+' '+sel.slice(5)+'</b>'+(evs.length?'':' <span style="color:var(--dim)">- nothing scheduled</span>')+evs.map(e=>'<div class="ev"><span class="tm '+e.cat[0]+'">'+esc(e.time)+'</span><span>'+esc(e.title)+dtLink(e)+'</span></div>').join('');
 }
 /* tasks */
 function renderTasks(){
@@ -191,6 +213,14 @@ function renderMem(){
 }
 function addMem(){const v=$('memin').value.trim();if(!v)return;const list=getMem();list.push({id:'u'+Date.now(),cat:$('memcat').value,text:v});setMem(list);$('memin').value='';renderMem()}
 function delMem(id){setMem(getMem().filter(m=>m.id!==id));renderMem()}
+const DTP={'JS-Dhablania-01689':'50504','TP-Ramadoss-01671':'48537','BC-Beth-01692':'51385','NG-Koh-01734':'52876','MS-Alexander-01737':'52962','GC-Brazier-01687':'51619','GC-Yong-01472':'50991'};
+function dtLink(e){const t=e.title||'';for(const k in DTP){if(t.indexOf(k)>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Project&RedirectToId='+DTP[k]+'" target="_blank" rel="noopener">[OPEN PROJECT]</a>'}if(t.indexOf('(D-Tools)')>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Schedule&RedirectToId='+(e.date||'')+'" target="_blank" rel="noopener">[OPEN D-TOOLS]</a>';return ''}
+function timeOpts(){let h='';for(let i=6;i<=21;i++){for(const m of ['00','30']){const hh=i>12?i-12:i;h+='<option value="'+String(i).padStart(2,'0')+':'+m+'">'+hh+':'+m+' '+(i<12?'AM':'PM')+'</option>'}}return h+'<option value="22:00">10:00 PM</option>'}
+function openAddEv(){$('evmodal').style.display='flex';$('evdate').value=sel||iso(new Date());$('evstart').innerHTML=timeOpts();$('evend').innerHTML=timeOpts();$('evstart').value='09:00';$('evend').value='10:00';$('evp').innerHTML='<option value="">(no project)</option>'+Object.keys(DTP).map(k=>'<option>'+k+'</option>').join('');$('evstat').textContent='';$('evname').value='';$('evloc').value='';$('evatt').value=''}
+function closeAddEv(){$('evmodal').style.display='none'}
+function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').value,start=$('evstart').value,end=$('evend').value,loc=$('evloc').value.trim(),att=$('evatt').value.trim(),proj=$('evp').value;if(!name||!date||!start||!end){$('evstat').textContent='NAME, DATE, START AND END REQUIRED';return}
+const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,project:proj,ts:Date.now(),status:'new'};
+if(fb){fb.child('dtools_events').push(rec);$('evstat').textContent='SENT TO FO. WILL BE IN D-TOOLS AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
 let chatRef=null,chatData={};
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
 function sendChat(){const v=$('chatin').value.trim();if(!v)return;if(!chatRef){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef.push({from:'you',text:v.slice(0,500),ts:Date.now()});$('chatin').value=''}
