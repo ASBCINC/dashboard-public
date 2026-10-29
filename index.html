@@ -229,7 +229,7 @@ function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb
 function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
 function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb){fb.child('done').child(String(n)).set(v?true:null);if(v){const t=(DATA.tasks||[]).find(x=>x.n===n);fb.child('task_done').push({n:n,url:(t&&t.url)||'',title:(t&&t.title)||'',ts:Date.now()})}}render()}
 /* banner */
-function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *'}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
+function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';const d=new Date(),m=d.getMonth(),dd=d.getDate();if((m===9&&dd>=29)||(m===10&&dd<=1)){t.textContent='* HAPPY HALLOWEEN * TRICK OR TREAT * PRESS START *';t.style.color='#ff9f1c';}else{t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *';t.style.color='';}}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
 /* pwa install + service worker */
 let deferPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferPrompt=e;const b=$('installbtn');if(b)b.style.display='inline-block'});
