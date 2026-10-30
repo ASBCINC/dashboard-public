@@ -281,10 +281,14 @@ function renderTasks(){
 }
 /* memorable */
 function renderMem(){
-  $('mems').innerHTML=getMem().map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+m.cat[0]+'">'+esc(m.text)+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
+  let dels=[];try{dels=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}
+  const seen={};let list=[];
+  (DATA.memorable||[]).forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
+  getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
+  $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+m.cat[0]+'">'+esc(m.text)+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
 }
 function addMem(){const v=$('memin').value.trim();if(!v)return;const list=getMem();list.push({id:'u'+Date.now(),cat:$('memcat').value,text:v});setMem(list);$('memin').value='';renderMem()}
-function delMem(id){setMem(getMem().filter(m=>m.id!==id));renderMem()}
+function delMem(id){let d=[];try{d=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}if(d.indexOf(id)<0){d.push(id);localStorage.setItem(LSN+'memdel',JSON.stringify(d))}setMem(getMem().filter(m=>m.id!==id));renderMem()}
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
 function sendChat(){const v=$('chatin').value.trim();if(!v)return;if(!chatRef){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef.push({from:'you',text:v.slice(0,500),ts:Date.now()});$('chatin').value=''}
 function renderChat(){
