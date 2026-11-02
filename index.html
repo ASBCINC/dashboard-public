@@ -117,7 +117,11 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   .two{display:contents}
   .bot{flex:none;display:flex;justify-content:space-between;align-items:center}
   .bot footer{margin-top:0}
-  .panel{margin-bottom:0;display:flex;flex-direction:column;min-height:0;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--pink),0 0 12px rgba(45,226,230,.2)}
+  .panel{margin-bottom:0;display:flex;flex-direction:column;min-height:0;min-width:0;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--pink),0 0 12px rgba(45,226,230,.2)}
+  .panel .ph{overflow:hidden}
+  .panel .ph span+span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+  .rline>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rline>span:last-child{white-space:nowrap}
   .panel .pb{flex:1;min-height:0;overflow:auto}
   .panel.cal{grid-column:1;grid-row:1/3}
   .panel.cal .grid{flex:1;min-height:0;overflow:auto;padding:8px 10px;align-content:start}
