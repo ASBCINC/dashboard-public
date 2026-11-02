@@ -51,24 +51,29 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .daylist .et.w{color:var(--red)}.daylist .et.p{color:var(--yellow)}.daylist .et.h{color:var(--blue)}
 /* project pipeline */
 .panel.pipe{max-height:210px;display:flex;flex-direction:column;overflow:hidden}
-.prow{display:flex;align-items:center;gap:8px;padding:3px 6px;border-bottom:1px solid rgba(255,255,255,.07);font-size:16px}
+.prow{display:flex;flex-direction:column;gap:2px;padding:4px 6px;border:1px solid rgba(255,255,255,.12);border-radius:4px;background:rgba(255,255,255,.03);font-size:13px;min-width:0}
 .prow:last-child{border-bottom:none}
-.prow.delayed{border-left:3px solid var(--red);background:rgba(255,75,75,.07)}
-.prow.today{border-left:3px solid var(--pink)}
+.prow.delayed{border-color:var(--red);background:rgba(255,75,75,.1)}
+.prow.today{border-color:var(--pink)}
 .prow.isdone{opacity:.4}
-.psel{font-family:'Press Start 2P';font-size:7px;background:#0d0620;padding:4px 2px;border:2px solid var(--cyan);cursor:pointer;flex:none;width:106px;color:var(--cyan)}
+.psel{font-family:'Press Start 2P';font-size:7px;background:#0d0620;padding:3px 2px;border:2px solid var(--cyan);cursor:pointer;flex:1;width:auto;min-width:0;color:var(--cyan)}
 .psel.s-s{color:var(--yellow);border-color:var(--yellow)}
 .psel.s-p{color:var(--pink);border-color:var(--pink)}
 .psel.s-u{color:var(--red);border-color:var(--red)}
 .psel.s-d{color:var(--green);border-color:var(--green)}
 .pname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
-.pname i{font-style:normal;color:rgba(232,230,255,.6);font-size:14px}
+.pname i{font-style:normal;color:rgba(232,230,255,.6);font-size:12px}
 .passn,.pins,.pval{flex:none;text-align:right;white-space:nowrap}
 .passn{width:66px;color:rgba(232,230,255,.75)}
 .pins{width:118px;color:#fff}
 .pval{width:78px;color:var(--green)}
 .dtag{color:var(--red);font-family:'Press Start 2P';font-size:7px;margin-left:4px}
 .pempty{color:var(--dim);opacity:.5;padding:8px 6px}
+.pcrow{display:flex;gap:6px;align-items:center;min-width:0}
+.pcrow .pins{width:auto;flex:none;font-size:11px}
+.pmeta{display:flex;justify-content:space-between;align-items:center;min-width:0;white-space:nowrap}
+.pmeta .passn{width:auto;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.pmeta .pval{width:auto;font-size:12px}
 /* tasks */
 .titem{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #4a2f8a}
 .titem:last-child{border-bottom:none}
@@ -99,12 +104,16 @@ input.pin,input.addt{background:#0d0620;border:2px solid var(--cyan);color:var(-
 input.pin:focus,input.addt:focus{outline:2px solid var(--yellow)}
 .addb{font-family:'Press Start 2P';font-size:10px;background:var(--pink);color:#fff;border:none;padding:8px 12px;cursor:pointer}
 .addb:hover{background:var(--yellow);color:#1c1038}
-#keepbtn{background:none;border:3px solid var(--green);color:var(--green);font-family:'Press Start 2P';font-size:10px;padding:9px 12px;cursor:pointer;box-shadow:0 0 10px rgba(63,218,107,.35)}
+#keepbtn,#fsbtn,#notifybtn,#restartbtn{width:86px;height:24px;font-family:'Press Start 2P';font-size:6px;padding:0;background:none;border:2px solid var(--cyan);color:var(--cyan);cursor:pointer;box-shadow:0 0 8px rgba(0,229,255,.3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:border-box;flex:none}
+#keepbtn{border-color:var(--green);color:var(--green);box-shadow:0 0 8px rgba(63,218,107,.35)}
 #keepbtn:hover{background:var(--green);color:#0d0620}
 #keepbtn.on{background:var(--green);color:#0d0620;box-shadow:0 0 16px rgba(63,218,107,.65);animation:bl 1s steps(1) infinite}
-#fsbtn{background:none;border:3px solid var(--cyan);color:var(--cyan);font-family:'Press Start 2P';font-size:10px;padding:9px 12px;cursor:pointer;box-shadow:0 0 10px rgba(0,229,255,.35)}
 #fsbtn:hover{background:var(--cyan);color:#0d0620}
 #fsbtn.on{background:var(--cyan);color:#0d0620;box-shadow:0 0 16px rgba(0,229,255,.65);animation:bl 1s steps(1) infinite}
+#notifybtn{border-color:var(--pink);color:var(--pink);box-shadow:0 0 8px rgba(255,45,120,.3)}
+#notifybtn:hover{background:var(--pink);color:#fff}
+#restartbtn{border-color:var(--yellow);color:var(--yellow);box-shadow:0 0 8px rgba(255,214,0,.3)}
+#restartbtn:hover{background:var(--yellow);color:#1c1038}
 #gate{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #gate .gt{font-family:'Press Start 2P';font-size:16px;color:var(--pink);text-shadow:2px 2px 0 var(--cyan)}
 #gate .ge{font-family:'Press Start 2P';font-size:10px;color:var(--yellow)}
@@ -137,6 +146,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 #banner.news .btag{background:var(--cyan);color:#000;animation:none}
 #banner.news .btext{color:var(--cyan);animation:bscroll 40s linear infinite}
 #banner .bx{font-family:'Press Start 2P';font-size:10px;color:#fff;flex:none;display:none;cursor:pointer}
+.hbtns{display:flex;gap:6px;flex:none;align-items:center}
 @keyframes bblink{50%{opacity:.25}}
 .rfund{margin:8px 0}
 .rline{display:flex;justify-content:space-between;font-size:19px;gap:10px}
@@ -152,7 +162,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 .tcat.w{color:var(--cyan);border-color:var(--cyan)}
 .tcat.p{color:var(--pink);border-color:var(--pink)}
 .titem.od .ttitle{color:var(--red)}
-#wx{font-family:'Press Start 2P';font-size:9px;color:var(--cyan);text-align:center;margin:2px 0 6px;letter-spacing:1px}
+#wx{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);text-align:center;margin:1px 0 3px;letter-spacing:1px}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 1px 3px)}
 /* WIDE LANDSCAPE BOARD (Nov 2 2026): fill screen, no page scroll */
 @media (min-width:700px) and (orientation:landscape){
@@ -193,7 +203,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   #wx{font-size:8px;letter-spacing:0}
   .panel.wide{grid-column:1/-1;grid-row:2;flex:none;height:140px;min-height:140px;overflow:hidden}
   .panel.pipe{grid-column:1/-1;grid-row:3;flex:none;height:150px;min-height:150px;overflow:hidden;display:flex;flex-direction:column}
-  .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:2px 4px}
+  .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;align-content:start}
   .daylist .ev{font-size:15px}
 }
 @media (min-width:1100px) and (orientation:landscape) and (min-height:820px){
@@ -204,9 +214,9 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .panel.note{flex:none;max-height:175px}
   .panel.wide{height:172px}
   .panel.pipe{height:186px}
-  .prow{font-size:18px;padding:5px 6px}
-  .pname i{font-size:16px}
-  .psel{width:118px;font-size:8px}
+  .prow{font-size:15px;padding:5px 7px}
+  .pname i{font-size:13px}
+  .psel{font-size:8px}
   .panel.wide .wchip{font-size:11px}.panel.wide .wdate{font-size:10px}.panel.wide .fcell{font-size:11px}.panel.wide .wempty{font-size:10px}
 }
 
@@ -249,8 +259,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
 #app.stage .panel.wide .fcell{font-size:11px}
 #app.stage .panel.wide .wempty{font-size:10px}
 #app.stage .panel.pipe{grid-column:1/-1;grid-row:3;flex:none;height:150px;min-height:150px;overflow:hidden;display:flex;flex-direction:column}
-#app.stage .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:2px 4px}
-#app.stage .prow{font-size:16px;padding:3px 6px}
+#app.stage .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;align-content:start}
+#app.stage .prow{font-size:13px;padding:4px 6px}
 
 </style>
 <link rel="manifest" href="manifest.json">
@@ -267,12 +277,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
 </div>
 <div class="wrap" id="app" hidden>
 <div class="top">
-<div id="banner"><span class="btag" id="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div><span class="bx" id="bx">&#10006;</span></div>
-  <h1>ANTHONY'S DASHBOARD</h1>
-  <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
-  <div id="wx">ATMOS: CONNECTING...</div>
-  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button id="keepbtn" onclick="toggleWake()">KEEP SCREEN ON</button><button id="fsbtn" onclick="toggleFs()">&#9654; FULL SCREEN</button></div>
-</div>
+<div id="banner"><span class="btag" id="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div><span class="bx" id="bx">&#10006;</span></div><div class="hbtns"><button id="notifybtn" onclick="toggleNotify()">NOTIFY</button><button id="restartbtn" onclick="location.reload()">RESTART</button><button id="keepbtn" onclick="toggleWake()">KEEP ON</button><button id="fsbtn" onclick="toggleFs()">&#9654; FULL SCREEN</button></div></div>
+<div id="wx">ATMOS: CONNECTING...</div>
 <div class="board">
   <div class="panel cal">
     <div class="ph"><span>CALENDAR</span><span id="calnote" style="font-size:9px"></span></div>
@@ -301,12 +307,6 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
     </div>
   </div>
 
-  <div class="panel note">
-    <div class="ph"><span>QUICK NOTE</span><span id="notenote" style="font-size:9px"></span></div>
-    <div class="pb">
-      <div class="addrow"><input class="addt" id="notein" placeholder="type a note for fo..." onkeydown="if(event.key==='Enter')saveNote()"><button class="addb" onclick="saveNote()">SAVE</button></div>
-    </div>
-  </div>
   </div>
 
   <div class="panel wide">
@@ -369,13 +369,13 @@ let actx=null;
 function sfx(f){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type='square';o.frequency.value=f||880;g.gain.value=.04;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+.07)}catch(e){}}
 document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('button'))sfx()});
 const MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-function saveNote(){const v=$('notein').value.trim();if(!v)return;if(!fb){$('notenote').textContent='NEEDS FIREBASE';return}fb.child('notes').push({text:v.slice(0,500),ts:Date.now()});$('notein').value='';$('notenote').textContent='SENT TO FO';setTimeout(()=>{const n=$('notenote');if(n)n.textContent=''},4000)}
+function saveNote(){const nEl=$('notein');if(!nEl)return;const v=nEl.value.trim();if(!v)return;if(!fb){$('notenote').textContent='NEEDS FIREBASE';return}fb.child('notes').push({text:v.slice(0,500),ts:Date.now()});$('notein').value='';$('notenote').textContent='SENT TO FO';setTimeout(()=>{const n=$('notenote');if(n)n.textContent=''},4000)}
 /* PUSH NOTIFY (added Oct 27 2026) */
 const VAPID_PUB='BBuzCk2pHlJYrXGqxPjLfKq9rnGIQsGFGTGZ5aN_0YqcXHNrn7YGzx_LlY6JiDo4AtUjhzm6DGDJRXah0I_O4U4';
 let pushSub=null;
 function u8(s){const p='='.repeat((4-s.length%4)%4);const b=(s+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(b);return Uint8Array.from(r,c=>c.charCodeAt(0))}
-async function initNotify(){try{if(!('serviceWorker'in navigator)||!('PushManager'in window)){const b=$('notifybtn');if(b)b.textContent='NO PUSH';return}const reg=await navigator.serviceWorker.ready;pushSub=await reg.pushManager.getSubscription();const b=$('notifybtn');if(b)b.textContent=pushSub?'NOTIFY OFF':'NOTIFY ON'}catch(e){}}
-async function toggleNotify(){sfx();try{const reg=await navigator.serviceWorker.ready;if(pushSub){await pushSub.unsubscribe();pushSub=null;$('notifybtn').textContent='NOTIFY ON';return}const perm=await Notification.requestPermission();if(perm!=='granted'){$('notifybtn').textContent='BLOCKED';return}pushSub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUB)});if(fb)fb.child('push_subs').push(pushSub.toJSON());$('notifybtn').textContent='NOTIFY OFF'}catch(e){$('notifybtn').textContent='NOTIFY ON'}}
+async function initNotify(){try{if(!('serviceWorker'in navigator)||!('PushManager'in window)){const b=$('notifybtn');if(b)b.textContent='NO PUSH';return}const reg=await navigator.serviceWorker.ready;pushSub=await reg.pushManager.getSubscription();const b=$('notifybtn');if(b)b.textContent=pushSub?'NOTIFY OFF':'NOTIFY'}catch(e){}}
+async function toggleNotify(){sfx();try{const reg=await navigator.serviceWorker.ready;if(pushSub){await pushSub.unsubscribe();pushSub=null;$('notifybtn').textContent='NOTIFY';return}const perm=await Notification.requestPermission();if(perm!=='granted'){$('notifybtn').textContent='BLOCKED';return}pushSub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUB)});if(fb)fb.child('push_subs').push(pushSub.toJSON());$('notifybtn').textContent='NOTIFY OFF'}catch(e){$('notifybtn').textContent='NOTIFY'}}
 initNotify();
 /* storage: firebase when configured, else localStorage */
 function fbInit(){
@@ -398,14 +398,14 @@ function clearAlerts(){sfx();const dels=bannerDels();(DATA.banner||[]).map(v=>v&
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 /* full screen toggle (arcade: tap or press F) */
 let fsOn=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
-function setFsBtn(){const b=$('fsbtn');if(!b)return;if(!document.documentElement.requestFullscreen&&!document.documentElement.webkitRequestFullscreen){b.textContent='NO FULL SCREEN';return}const on=fsOn();b.classList.toggle('on',on);b.textContent=on?'■ EXIT FULL SCREEN':'► FULL SCREEN'}
+function setFsBtn(){const b=$('fsbtn');if(!b)return;if(!document.documentElement.requestFullscreen&&!document.documentElement.webkitRequestFullscreen){b.textContent='NO FULL SCREEN';return}const on=fsOn();b.classList.toggle('on',on);b.textContent=on?'■ EXIT FS':'FULL SCREEN'}
 function toggleFs(){const d=document.documentElement;if(fsOn()){(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document)}else{(d.requestFullscreen||d.webkitRequestFullscreen||d.webkitRequestFullScreen||function(){}).call(d)}}
 document.addEventListener('fullscreenchange',setFsBtn);document.addEventListener('webkitfullscreenchange',setFsBtn);
 document.addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;toggleFs()}});
 setFsBtn();
 /* keep screen awake (screen wake lock, remembered per device) */
 let wakeSen=null;
-function setWakeBtn(){const b=$('keepbtn');if(!b)return;b.classList.toggle('on',!!wakeSen);b.textContent=wakeSen?'SCREEN LOCKED 1UP':'KEEP SCREEN ON'}
+function setWakeBtn(){const b=$('keepbtn');if(!b)return;b.classList.toggle('on',!!wakeSen);b.textContent=wakeSen?'LOCKED 1UP':'KEEP ON'}
 async function toggleWake(){
   const b=$('keepbtn');
   if(!navigator.wakeLock){if(b)b.textContent='NO WAKE LOCK';return}
@@ -516,12 +516,12 @@ function renderRamp(){
   $('rampnote').textContent='LIMITS LIVE FROM RAMP';
 }
 /* project pipeline (V16) */
-const STAGES=['QUOTED','SCHEDULED','IN PROGRESS','PUNCH LIST','DONE'];
-function sCls(s){return s==='QUOTED'?'q':s==='SCHEDULED'?'s':s==='IN PROGRESS'?'p':s==='PUNCH LIST'?'u':'d'}
+const STAGES=['NEW','PLANNING','SCHEDULED','IN PROGRESS','DELAYED','INSTALLED','COMPLETED'];
+function sCls(s){return s==='SCHEDULED'?'s':s==='IN PROGRESS'?'p':s==='DELAYED'?'u':(s==='NEW'||s==='PLANNING')?'q':'d'}
 function pFmt(s){if(!s)return'';const d=new Date(s+'T12:00:00');if(isNaN(d))return s;const W=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return W[d.getDay()]+' '+M[d.getMonth()]+' '+d.getDate()}
 function pMoney(v){return v==null||v===''||isNaN(Number(v))?'\u2014':'$'+Number(v).toLocaleString('en-US')}
 function mergePipeLocal(){try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');(DATA.pipe||[]).forEach(p=>{if(m[p.code])p.stage=m[p.code]})}catch(e){}}
-function renderPipe(){const el=$('pipelist');if(!el)return;mergePipeLocal();const t0=new Date();t0.setHours(0,0,0,0);const arr=(DATA.pipe||[]).map(p=>{let d=null,dl=false;if(p.inst){d=new Date(p.inst+'T12:00:00');dl=!isNaN(d)&&d<t0&&p.stage!=='DONE'}return Object.assign({d:d,dl:dl},p)});const srt=(a,b)=>a.d-b.d;const delayed=arr.filter(p=>p.dl).sort(srt);const up=arr.filter(p=>p.d&&!p.dl&&p.stage!=='DONE').sort(srt);const nd=arr.filter(p=>!p.d&&p.stage!=='DONE');const dn=arr.filter(p=>p.stage==='DONE');const all=delayed.concat(up,nd,dn);const act=arr.filter(p=>p.stage!=='DONE');const tot=act.reduce((s,p)=>s+(Number(p.value)||0),0);const n=$('pnote');if(n)n.textContent=(tot?'$'+tot.toLocaleString('en-US')+' PIPELINE \u00b7 ':'')+act.length+' ACTIVE'+(delayed.length?' \u00b7 '+delayed.length+' DELAYED':'');el.innerHTML=all.map(p=>{const esc=String(p.code).replace(/'/g,"\\'");const sel='<select style="width:106px;flex:none" class="psel s-'+sCls(p.stage)+'" onchange="setPipeStage(\''+esc+'\',this.value)">'+STAGES.map(s=>'<option'+(s===p.stage?' selected':'')+'>'+s+'</option>').join('')+'</select>';const inst=p.d?pFmt(p.inst)+(p.dl?' <b class="dtag">DELAYED</b>':''):'\u2014';const ass=p.assigned?pFmt(p.assigned):'\u2014';return '<div class="prow'+(p.stage==='DONE'?' isdone':'')+(p.dl?' delayed':'')+(p.d&&!p.dl&&p.d.getTime()===t0.getTime()?' today':'')+'">'+sel+'<span class="pname">'+p.code+(p.name?' <i>'+p.name+'</i>':'')+'</span><span class="passn">'+ass+'</span><span class="pins">'+inst+'</span><span class="pval">'+pMoney(p.value)+'</span></div>'}).join('')||'<div class="pempty">NO PROJECTS IN PIPELINE YET</div>'}
+function renderPipe(){const el=$('pipelist');if(!el)return;mergePipeLocal();const MAP={QUOTED:'PLANNING','PUNCH LIST':'INSTALLED',DONE:'COMPLETED'};(DATA.pipe||[]).forEach(p=>{if(MAP[p.stage])p.stage=MAP[p.stage]});const t0=new Date();t0.setHours(0,0,0,0);const arr=(DATA.pipe||[]).map(p=>{let d=null,dl=false;if(p.inst){d=new Date(p.inst+'T12:00:00');dl=!isNaN(d)&&d<t0&&p.stage!=='COMPLETED'}return Object.assign({d:d,dl:dl},p)});const srt=(a,b)=>a.d-b.d;const delayed=arr.filter(p=>p.dl).sort(srt);const up=arr.filter(p=>p.d&&!p.dl&&p.stage!=='COMPLETED').sort(srt);const nd=arr.filter(p=>!p.d&&p.stage!=='COMPLETED');const dn=arr.filter(p=>p.stage==='COMPLETED');const all=delayed.concat(up,nd,dn);const act=arr.filter(p=>p.stage!=='COMPLETED');const tot=act.reduce((s,p)=>s+(Number(p.value)||0),0);const n=$('pnote');if(n)n.textContent=(tot?'$'+tot.toLocaleString('en-US')+' PIPELINE \u00b7 ':'')+act.length+' ACTIVE'+(delayed.length?' \u00b7 '+delayed.length+' DELAYED':'');el.innerHTML=all.map(p=>{const esc=String(p.code).replace(/'/g,"\\'");const sel='<select class="psel s-'+sCls(p.stage)+'" onchange="setPipeStage(\''+esc+'\',this.value)">'+STAGES.map(s=>'<option'+(s===p.stage?' selected':'')+'>'+s+'</option>').join('')+'</select>';const inst=p.d?pFmt(p.inst)+(p.dl?' <b class="dtag">DELAYED</b>':''):'\u2014';const ass=p.assigned?pFmt(p.assigned):'\u2014';return '<div class="prow'+(p.stage==='COMPLETED'?' isdone':'')+(p.dl?' delayed':'')+(p.d&&!p.dl&&p.d.getTime()===t0.getTime()?' today':'')+'"><div class="pcrow">'+sel+'<span class="pins">'+inst+'</span></div><span class="pname">'+p.code+(p.name?' <i>'+p.name+'</i>':'')+'</span><span class="pmeta"><span class="passn">'+ass+'</span><span class="pval">'+pMoney(p.value)+'</span></span></div>'}).join('')||'<div class="pempty">NO PROJECTS IN PIPELINE YET</div>'}
 function setPipeStage(code,stage){sfx();const p=(DATA.pipe||[]).find(x=>x.code===code);if(p)p.stage=stage;try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');m[code]=stage;localStorage.setItem(LSN+'pstage',JSON.stringify(m))}catch(e){}if(fb){try{fb.child('pipe').child(code).set({stage:stage,ts:Date.now()})}catch(e){}}renderPipe()}
 function fitBoard(){const b=document.querySelector('.board');if(!b)return;const mq=window.matchMedia('(min-width:700px) and (orientation:landscape)');if(!mq.matches){b.style.gridTemplateRows='';return}const top=document.querySelector('.top'),bot=document.querySelector('.bot');const fx=window.matchMedia('(min-width:1100px) and (orientation:landscape) and (min-height:820px)').matches?386:318;const pad=36;const h=window.innerHeight-(top?top.offsetHeight:0)-(bot?bot.offsetHeight:0)-pad-fx;b.style.gridTemplateRows=Math.max(170,h)+'px auto auto'}
 
