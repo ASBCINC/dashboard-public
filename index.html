@@ -82,6 +82,9 @@ input.pin:focus,input.addt:focus{outline:2px solid var(--yellow)}
 #keepbtn{background:none;border:3px solid var(--green);color:var(--green);font-family:'Press Start 2P';font-size:10px;padding:9px 12px;cursor:pointer;box-shadow:0 0 10px rgba(63,218,107,.35)}
 #keepbtn:hover{background:var(--green);color:#0d0620}
 #keepbtn.on{background:var(--green);color:#0d0620;box-shadow:0 0 16px rgba(63,218,107,.65);animation:bl 1s steps(1) infinite}
+#fsbtn{background:none;border:3px solid var(--cyan);color:var(--cyan);font-family:'Press Start 2P';font-size:10px;padding:9px 12px;cursor:pointer;box-shadow:0 0 10px rgba(0,229,255,.35)}
+#fsbtn:hover{background:var(--cyan);color:#0d0620}
+#fsbtn.on{background:var(--cyan);color:#0d0620;box-shadow:0 0 16px rgba(0,229,255,.65);animation:bl 1s steps(1) infinite}
 #gate{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #gate .gt{font-family:'Press Start 2P';font-size:16px;color:var(--pink);text-shadow:2px 2px 0 var(--cyan)}
 #gate .ge{font-family:'Press Start 2P';font-size:10px;color:var(--yellow)}
@@ -199,7 +202,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
   <div id="wx">ATMOS: CONNECTING...</div>
-  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button id="keepbtn" onclick="toggleWake()">KEEP SCREEN ON</button></div>
+  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button id="keepbtn" onclick="toggleWake()">KEEP SCREEN ON</button><button id="fsbtn" onclick="toggleFs()">&#9654; FULL SCREEN</button></div>
 </div>
 <div class="board">
   <div class="panel cal">
@@ -319,6 +322,13 @@ function renderBanner(){const b=$('banner'),t=$('btext'),g=$('btag'),x=$('bx');i
 function clearAlerts(){sfx();const dels=bannerDels();(DATA.banner||[]).map(v=>v&&v.text?v.text:v).filter(Boolean).forEach(v=>{const k=bannerHash(v);if(dels.indexOf(k)<0){dels.push(k);if(fb)fb.child('banndel').child(k).set(v)}});localStorage.setItem(LSN+'bdel',JSON.stringify(dels));renderBanner()}
 /* service worker */
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+/* full screen toggle (arcade: tap or press F) */
+let fsOn=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+function setFsBtn(){const b=$('fsbtn');if(!b)return;if(!document.documentElement.requestFullscreen&&!document.documentElement.webkitRequestFullscreen){b.textContent='NO FULL SCREEN';return}const on=fsOn();b.classList.toggle('on',on);b.textContent=on?'■ EXIT FULL SCREEN':'► FULL SCREEN'}
+function toggleFs(){const d=document.documentElement;if(fsOn()){(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document)}else{(d.requestFullscreen||d.webkitRequestFullscreen||d.webkitRequestFullScreen||function(){}).call(d)}}
+document.addEventListener('fullscreenchange',setFsBtn);document.addEventListener('webkitfullscreenchange',setFsBtn);
+document.addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;toggleFs()}});
+setFsBtn();
 /* keep screen awake (screen wake lock, remembered per device) */
 let wakeSen=null;
 function setWakeBtn(){const b=$('keepbtn');if(!b)return;b.classList.toggle('on',!!wakeSen);b.textContent=wakeSen?'SCREEN LOCKED 1UP':'KEEP SCREEN ON'}
