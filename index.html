@@ -135,11 +135,11 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
 @media (min-width:700px) and (orientation:landscape){
   html,body{height:100%}
   body{overflow:hidden;font-size:15px}
-  .wrap{max-width:none;width:100%;height:100vh;height:100dvh;padding:10px 16px 6px;display:flex;flex-direction:column;gap:10px}
+  .wrap{max-width:none;width:100%;height:100vh;height:100dvh;height:100%;max-height:100vh;max-height:100dvh;overflow:hidden;padding:10px 16px 6px;display:flex;flex-direction:column;gap:10px}
   .top{flex:none}
   h1{font-size:15px;margin:2px 0 0}
   .sub{font-size:15px;margin-bottom:6px}
-  .board{flex:1;min-height:0;display:grid;grid-template-columns:1.15fr .95fr .95fr .9fr;grid-template-rows:minmax(0,1fr) auto;gap:14px}
+  .board{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.15fr .95fr .95fr .9fr;grid-template-rows:minmax(0,1fr) auto;gap:14px}
   .two{display:contents}
   .bot{flex:none;display:flex;justify-content:space-between;align-items:center}
   .bot footer{margin-top:0}
@@ -149,9 +149,9 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .rline>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .rline>span:last-child{white-space:nowrap}
   .panel .pb{flex:1;min-height:0;overflow:auto}
-  .panel.cal{grid-column:1;grid-row:1/2}
-  .panel.cal .grid{flex:1;min-height:0;overflow:auto;padding:8px 10px;align-content:start}
-  .panel.cal .daylist{flex:none;max-height:46%;overflow:auto}
+  .panel.cal{grid-column:1;grid-row:1/2;overflow:hidden}
+  .panel.cal .grid{flex:0 1 auto;min-height:0;max-height:55%;overflow:auto;padding:8px 10px;align-content:start}
+  .panel.cal .daylist{flex:1 1 0;min-height:0;overflow:auto}
   .cell{min-height:30px}
   .panel.tasks{grid-column:2;grid-row:1/2}
   .panel.mem{grid-column:3;grid-row:1/2}
@@ -170,7 +170,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   #wx{font-size:8px;letter-spacing:0}
   .panel.wide{grid-column:1/-1;grid-row:2;flex:none;height:150px;min-height:150px;overflow:hidden}
 }
-@media (min-width:1100px) and (orientation:landscape){
+@media (min-width:1100px) and (orientation:landscape) and (min-height:820px){
   body{font-size:18px}
   .mtext,.ttitle{font-size:18px}
   .cell{min-height:36px}
