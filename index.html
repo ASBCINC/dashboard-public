@@ -101,7 +101,7 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .mem:last-child{border-bottom:none}
 .star{color:var(--yellow);font-size:20px}
 .mtext{flex:1;font-size:20px}
-.mtext.w{color:var(--cyan)}.mtext.p{color:var(--pink)}
+.mtext.w{color:var(--cyan)}.mtext.p{color:var(--pink)}.mtext.n{color:var(--yellow)}
 .x{color:var(--dim);cursor:pointer;font-family:'Press Start 2P';font-size:10px;padding:4px}
 .x:hover{color:var(--pink)}
 .addrow{display:flex;gap:8px;margin-top:10px}
@@ -489,7 +489,7 @@ function renderMem(){
   const seen={};let list=[];
   (DATA.memorable||[]).forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
   getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
-  $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+((m.cat||'w')[0])+'">'+esc(m.t||m.text||m.title||'')+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
+  $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+(m.k==='new'?'n':((m.cat||'w')[0]))+'">'+esc(m.t||m.text||m.title||'')+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
 }
 function delMem(id){let d=[];try{d=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}if(d.indexOf(id)<0){d.push(id);localStorage.setItem(LSN+'memdel',JSON.stringify(d))}setMem(getMem().filter(m=>m.id!==id));if(fb)fb.child('memdel').child(id).set(true);renderMem()}
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
