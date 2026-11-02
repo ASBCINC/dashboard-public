@@ -68,6 +68,9 @@ input.pin,input.addt{background:#0d0620;border:2px solid var(--cyan);color:var(-
 input.pin:focus,input.addt:focus{outline:2px solid var(--yellow)}
 .addb{font-family:'Press Start 2P';font-size:10px;background:var(--pink);color:#fff;border:none;padding:8px 12px;cursor:pointer}
 .addb:hover{background:var(--yellow);color:#1c1038}
+#keepbtn{background:none;border:3px solid var(--green);color:var(--green);font-family:'Press Start 2P';font-size:10px;padding:9px 12px;cursor:pointer;box-shadow:0 0 10px rgba(63,218,107,.35)}
+#keepbtn:hover{background:var(--green);color:#0d0620}
+#keepbtn.on{background:var(--green);color:#0d0620;box-shadow:0 0 16px rgba(63,218,107,.65);animation:bl 1s steps(1) infinite}
 #gate{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #gate .gt{font-family:'Press Start 2P';font-size:16px;color:var(--pink);text-shadow:2px 2px 0 var(--cyan)}
 #gate .ge{font-family:'Press Start 2P';font-size:10px;color:var(--yellow)}
@@ -160,7 +163,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   <div id="tminus"></div>
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
-  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button class="addb" id="installbtn" style="display:none" onclick="installApp()">INSTALL APP</button></div>
+  <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button id="keepbtn" onclick="toggleWake()">KEEP SCREEN ON</button></div>
 </div>
 <div class="board">
   <div class="panel cal">
@@ -273,12 +276,22 @@ function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
 function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb){fb.child('done').child(String(n)).set(v?true:null);if(v){const t=(DATA.tasks||[]).find(x=>x.n===n);fb.child('task_done').push({n:n,url:(t&&t.url)||'',title:(t&&t.title)||'',ts:Date.now()})}}render()}
 /* banner */
 function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';const d=new Date(),m=d.getMonth(),dd=d.getDate();if((m===9&&dd>=29)||(m===10&&dd<=1)){t.textContent='* HAPPY HALLOWEEN * TRICK OR TREAT * PRESS START *';t.style.color='#ff9f1c';}else{t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *';t.style.color='';}}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
-/* pwa install + service worker */
-let deferPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferPrompt=e;const b=$('installbtn');if(b)b.style.display='inline-block'});
-window.addEventListener('appinstalled',()=>{deferPrompt=null;const b=$('installbtn');if(b)b.style.display='none'});
-function installApp(){if(deferPrompt){deferPrompt.prompt();deferPrompt=null}else{const b=$('installbtn');if(b)b.style.display='none'}}
+/* service worker */
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+/* keep screen awake (screen wake lock, remembered per device) */
+let wakeSen=null;
+function setWakeBtn(){const b=$('keepbtn');if(!b)return;b.classList.toggle('on',!!wakeSen);b.textContent=wakeSen?'SCREEN LOCKED 1UP':'KEEP SCREEN ON'}
+async function toggleWake(){
+  const b=$('keepbtn');
+  if(!navigator.wakeLock){if(b)b.textContent='NO WAKE LOCK';return}
+  try{
+    if(wakeSen){await wakeSen.release();wakeSen=null;localStorage.removeItem(LSN+'wake')}
+    else{wakeSen=await navigator.wakeLock.request('screen');localStorage.setItem(LSN+'wake','1');wakeSen.addEventListener('release',()=>{wakeSen=null;setWakeBtn()})}
+    setWakeBtn();
+  }catch(e){if(b)b.textContent='NO WAKE LOCK'}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&navigator.wakeLock&&!wakeSen&&localStorage.getItem(LSN+'wake')){navigator.wakeLock.request('screen').then(s=>{wakeSen=s;s.addEventListener('release',()=>{wakeSen=null;setWakeBtn()});setWakeBtn()}).catch(()=>{})}});
+if(navigator.wakeLock&&localStorage.getItem(LSN+'wake')){navigator.wakeLock.request('screen').then(s=>{wakeSen=s;s.addEventListener('release',()=>{wakeSen=null;setWakeBtn()});setWakeBtn()}).catch(()=>{})}
 /* pin */
 if(localStorage.getItem(LSN+'pin')===PIN){pin=PIN;unlock()}else{$('pinin').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin()})}
 function tryPin(){if($('pinin').value===PIN){pin=$('pinin').value;localStorage.setItem(LSN+'pin',PIN);unlock()}else{$('.ge').textContent='WRONG PIN';$('pinin').value=''}}
