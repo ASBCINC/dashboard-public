@@ -477,20 +477,20 @@ function scoreInit(){if(!fb||!fb.child)return;fb.child('task_done').on('value',s
 function liveTasks(){fetch('https://api.github.com/repos/ASBCINC/dashboard/issues?state=open&per_page=30').then(r=>{if(!r.ok)throw 0;return r.json()}).then(is=>{if(!Array.isArray(is)||!is.length)return;const map=is.filter(i=>!i.pull_request).map(i=>{const cat=(i.labels||[]).some(l=>String(l.name).toLowerCase().indexOf('personal')>=0)?'personal':'work';let due=null;const m=String(i.body||'').match(/DUE:\s*(\d{4}-\d{2}-\d{2})/);if(m){const d=new Date(m[1]+'T12:00:00');const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MO2=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];due=WD[d.getDay()]+' '+MO2[d.getMonth()]+' '+d.getDate()}return{n:i.number,cat:cat,title:i.title,url:i.html_url,due:due}});if(map.length){DATA.tasks=map;renderTasks()}}).catch(()=>{})}
 function renderTasks(){
   const now=new Date(),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const list=(DATA.tasks||[]).filter(t=>!isDone(t.n));
+  const list=(DATA.tasks||[]).filter(t=>!isDone(t.n)&&t.cat!=='personal');
   list.forEach(t=>{const d=tdue(t);t._k=d?d.getTime():9e9;t._od=!!d&&d<t0});
   list.sort((a,b)=>a._k-b._k);
-  const w=list.filter(t=>t.cat!=='personal').length,p=list.length-w,tc=$('tcount');
-  if(tc)tc.textContent=list.length?list.length+' OPEN \u00b7 '+w+' WORK \u00b7 '+p+' PERS':'';
+  const w=list.length,tc=$('tcount');
+  if(tc)tc.textContent=list.length?list.length+' OPEN \u00b7 '+w+' WORK':'';
   $('alltasks').innerHTML=list.length?list.map(x=>'<div class="titem'+(x._od?' od':'')+'"><div class="pxbox" onclick="setDone('+x.n+','+!isDone(x.n)+')"></div><span class="tcat '+(x.cat==='personal'?'p':'w')+'">'+(x.cat==='personal'?'PERS':'WORK')+'</span><div class="tt"><div class="ttitle">'+esc(x.title)+'</div>'+(x.detail?'<div class="tdetail">'+esc(x.detail)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>').join(''):'<div class="tdetail">nothing here.</div>';
 }
 /* memorable */
 function renderMem(){
   let dels=[];try{dels=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}
   const seen={};let list=[];
-  (DATA.memorable||[]).forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
-  getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
-  $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+((m.cat||'p')[0])+'">'+esc(m.t||m.text||m.title||'')+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
+  (DATA.memorable||[]).forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
+  getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
+  $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+((m.cat||'w')[0])+'">'+esc(m.t||m.text||m.title||'')+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
 }
 function delMem(id){let d=[];try{d=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}if(d.indexOf(id)<0){d.push(id);localStorage.setItem(LSN+'memdel',JSON.stringify(d))}setMem(getMem().filter(m=>m.id!==id));if(fb)fb.child('memdel').child(id).set(true);renderMem()}
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
