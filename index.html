@@ -188,7 +188,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .rline>span:last-child{white-space:nowrap}
   .panel .pb{flex:1;min-height:0;overflow:auto}
   .panel.cal{grid-column:1;grid-row:1/2;overflow:hidden}
-  .panel.cal .grid{flex:0 1 auto;min-height:0;max-height:55%;overflow:auto;padding:8px 10px;align-content:start}
+  .panel.cal .grid{flex:0 1 auto;min-height:0;max-height:55%;overflow:auto;padding:8px 10px;grid-auto-rows:1fr}
   .panel.cal .daylist{flex:1 1 0;min-height:0;overflow:auto}
   .cell{min-height:30px}
   .panel.tasks{grid-column:2;grid-row:1/2}
@@ -207,7 +207,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .addrow input{min-width:0}
   #wx{font-size:8px;letter-spacing:0}
   .panel.pipe{grid-column:1/-1;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-  .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;align-content:start}
+  .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;grid-auto-rows:1fr}
   .daylist .ev{font-size:15px}
 }
 @media (min-width:1100px) and (orientation:landscape) and (min-height:820px){
@@ -237,7 +237,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
 #app.stage .panel .ph span+span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 #app.stage .panel .pb{flex:1;min-height:0;overflow:auto}
 #app.stage .panel.cal{grid-column:1;grid-row:1/2;overflow:hidden}
-#app.stage .panel.cal .grid{flex:0 1 auto;min-height:0;max-height:55%;overflow:auto;padding:8px 10px;align-content:start}
+#app.stage .panel.cal .grid{flex:0 1 auto;min-height:0;max-height:55%;overflow:auto;padding:8px 10px;grid-auto-rows:1fr}
 #app.stage .panel.cal .daylist{flex:1 1 0;min-height:0;overflow:auto}
 #app.stage .cell{min-height:30px}
 #app.stage .panel.tasks{grid-column:2;grid-row:1/2}
@@ -260,7 +260,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
 #app.stage .panel.wide .fcell{font-size:11px}
 #app.stage .panel.wide .wempty{font-size:10px}
 #app.stage .panel.pipe{grid-column:1/-1;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-#app.stage .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;align-content:start}
+#app.stage .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;grid-auto-rows:1fr}
 #app.stage .prow{font-size:13px;padding:4px 6px}
 
 </style>
@@ -470,7 +470,7 @@ function wxTxt(c){return c===0?'CLEAR':c<3?'FEW CLOUDS':c===3?'OVERCAST':c<50?'F
 function renderWx(){const el=$('wx');if(!el)return;let c=null;try{c=JSON.parse(localStorage.getItem(LSN+'wx')||'null')}catch(e){}
 if(c&&Date.now()-c.ts<18e5){wxPart='ANTIOCH '+c.t+'\u00b0F \u00b7 '+wxTxt(c.code)+' \u00b7 HIGH '+c.hi+' LOW '+c.lo;renderHud();return}
 fetch('https://api.open-meteo.com/v1/forecast?latitude=38.03&longitude=-121.81&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&timezone=America%2FLos_Angeles').then(r=>r.json()).then(j=>{c={ts:Date.now(),t:Math.round(j.current.temperature_2m),code:j.current.weather_code,hi:Math.round(j.daily.temperature_2m_max[0]),lo:Math.round(j.daily.temperature_2m_min[0]),fc:{d:j.daily.time,mx:j.daily.temperature_2m_max,mn:j.daily.temperature_2m_min,c:j.daily.weather_code}};try{localStorage.setItem(LSN+'wx',JSON.stringify(c))}catch(e){}wxPart='ANTIOCH '+c.t+'\u00b0F \u00b7 '+wxTxt(c.code)+' \u00b7 HIGH '+c.hi+' LOW '+c.lo;renderHud();renderFc()}).catch(()=>{wxPart='ATMOS: OFFLINE';renderHud()})}
-function renderHud(){const el=$('wx');if(!el)return;const s=scoreCount();el.textContent='SCORE '+s.t+' TODAY \u00b7 '+s.x+' XP \u00b7 '+wxPart}
+function renderHud(){const el=$('wx');if(!el)return;el.style.display='none'}
 function scoreCount(){let t=0,x=0;if(fbTD){const d=new Date(),t0=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();Object.keys(fbTD).forEach(k=>{const e=fbTD[k];const ts=e&&e.ts?e.ts:0;if(ts){x++;if(ts>=t0)t++}})}else{try{const s=JSON.parse(localStorage.getItem(LSN+'score')||'null');if(s&&s.d===new Date().toDateString()){t=s.t||0;x=s.x||0}}catch(e){}}return{t:t,x:x}}
 function scoreBump(){let s=null;try{s=JSON.parse(localStorage.getItem(LSN+'score')||'null')}catch(e){}if(!s||s.d!==new Date().toDateString())s={d:new Date().toDateString(),t:0,x:0};s.t++;s.x++;localStorage.setItem(LSN+'score',JSON.stringify(s))}
 function scoreInit(){if(!fb||!fb.child)return;fb.child('task_done').on('value',s=>{fbTD=s.val()||{};renderHud()},()=>{fbTD=null})}
