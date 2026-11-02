@@ -97,6 +97,12 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 #banner.idle .btag{background:var(--cyan);color:#000;animation:none}
 #banner.idle .btext{color:var(--dim);animation:bscroll 26s linear infinite}
 @keyframes bscroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+#banner.alr{cursor:pointer}
+#banner.alr .btext{animation:bscroll 16s linear infinite}
+#banner.news{border-color:rgba(45,226,230,.4)}
+#banner.news .btag{background:var(--cyan);color:#000;animation:none}
+#banner.news .btext{color:var(--cyan);animation:bscroll 40s linear infinite}
+#banner .bx{font-family:'Press Start 2P';font-size:10px;color:#fff;flex:none;display:none;cursor:pointer}
 @keyframes bblink{50%{opacity:.25}}
 .rfund{margin:8px 0}
 .rline{display:flex;justify-content:space-between;font-size:19px;gap:10px}
@@ -115,7 +121,6 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
   .top{flex:none}
   h1{font-size:15px;margin:2px 0 0}
   .sub{font-size:15px;margin-bottom:6px}
-  #tminus{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
   .board{flex:1;min-height:0;display:grid;grid-template-columns:1.15fr .95fr .95fr .9fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:14px}
   .two{display:contents}
   .bot{flex:none;display:flex;justify-content:space-between;align-items:center}
@@ -159,8 +164,7 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 </div>
 <div class="wrap" id="app" hidden>
 <div class="top">
-<div id="banner"><span class="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div></div></div>
-  <div id="tminus"></div>
+<div id="banner"><span class="btag" id="btag">! ALERT</span><div class="btrack"><div class="btext" id="btext"></div><span class="bx" id="bx">&#10006;</span></div>
   <h1>ANTHONY'S DASHBOARD</h1>
   <div class="sub">FO SYSTEM ONLINE <span class="blink">_</span></div>
   <div style="text-align:center;margin-bottom:14px"><button class="addb" id="notifybtn" onclick="toggleNotify()">NOTIFY ON</button><button class="addb" id="restartbtn" onclick="location.reload()">RESTART</button><button id="keepbtn" onclick="toggleWake()">KEEP SCREEN ON</button></div>
@@ -245,15 +249,11 @@ function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').valu
 const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,project:proj,ts:Date.now(),status:'new'};
 if(fb){fb.child('dtools_events').push(rec);$('evstat').textContent='SENT TO FO. WILL BE IN D-TOOLS AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
 
-/* SFX + T-MINUS + QUICK NOTE (added Oct 27 2026) */
+/* SFX + QUICK NOTE (added Oct 27 2026) */
 let actx=null;
 function sfx(f){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type='square';o.frequency.value=f||880;g.gain.value=.04;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+.07)}catch(e){}}
 document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('button'))sfx()});
 const MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-function parseBillDue(s){s=s||'';const iso=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);if(iso)return new Date(+iso[1],+iso[2]-1,+iso[3],17,0,0);const m=/([A-Za-z]{3})\s+(\d{1,2})/.exec(s);if(!m)return null;const mo=MONTHS[m[1].toLowerCase()];if(mo==null)return null;const n=new Date();const y=n.getFullYear();let d=new Date(y,mo,+m[2],17,0,0);if(d<=n)d=new Date(y+1,mo,+m[2],17,0,0);return d}
-function nextTargets(){const out=[];const now=new Date();(DATA.bills||[]).forEach(b=>{const d=parseBillDue(b.due||'');if(d)out.push({label:b.name,d})});(DATA.tasks||[]).forEach(t=>{if(!t||!t.due||isDone(t.n))return;const d=parseBillDue(t.due);if(d&&d>now){const l=String(t.title||'task');out.push({label:l.length>34?l.slice(0,32)+'..':l,d})}});(DATA.calendar||[]).forEach(e=>{if(e.cat==='holiday'||!e.date)return;const p=e.date.split('-');if(p.length<3||isNaN(+p[0]))return;const d=new Date(+p[0],+p[1]-1,+p[2],9,0,0);if(d>now)out.push({label:e.title||'event',d})});out.sort((a,b)=>a.d-b.d);return out.slice(0,3)}
-function renderTminus(){const el=$('tminus');if(!el)return;const ts=nextTargets();el.innerHTML=ts.map(t=>{const ms=t.d-Date.now();if(ms<=0)return '';const dd=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5),mm=Math.floor(ms%36e5/6e4),ss=Math.floor(ms%6e4/1e3);const z=x=>String(x).padStart(2,'0');return '<div class="trow"><span>'+esc(t.label)+'</span><span class="tval">T-'+dd+'D '+z(hh)+':'+z(mm)+':'+z(ss)+'</span></div>'}).join('')}
-setInterval(renderTminus,1000);
 function saveNote(){const v=$('notein').value.trim();if(!v)return;if(!fb){$('notenote').textContent='NEEDS FIREBASE';return}fb.child('notes').push({text:v.slice(0,500),ts:Date.now()});$('notein').value='';$('notenote').textContent='SENT TO FO';setTimeout(()=>{const n=$('notenote');if(n)n.textContent=''},4000)}
 /* PUSH NOTIFY (added Oct 27 2026) */
 const VAPID_PUB='BBuzCk2pHlJYrXGqxPjLfKq9rnGIQsGFGTGZ5aN_0YqcXHNrn7YGzx_LlY6JiDo4AtUjhzm6DGDJRXah0I_O4U4';
@@ -275,7 +275,10 @@ function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb
 function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
 function setDone(n,v){localStorage.setItem(LSN+'done_'+n,v?'1':'0');if(fb){fb.child('done').child(String(n)).set(v?true:null);if(v){const t=(DATA.tasks||[]).find(x=>x.n===n);fb.child('task_done').push({n:n,url:(t&&t.url)||'',title:(t&&t.title)||'',ts:Date.now()})}}render()}
 /* banner */
-function renderBanner(){const b=$('banner'),t=$('btext');if(!b||!t)return;const items=(DATA.banner||[]).map(x=>x.text||x).filter(Boolean);if(!items.length){b.className='idle';const d=new Date(),m=d.getMonth(),dd=d.getDate();if((m===9&&dd>=29)||(m===10&&dd<=1)){t.textContent='* HAPPY HALLOWEEN * TRICK OR TREAT * PRESS START *';t.style.color='#ff9f1c';}else{t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *';t.style.color='';}}else{b.className='';t.textContent='*** '+items.join('  ***  ')+'  ***'}}
+function bannerHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return 'b'+(h>>>0).toString(36)}
+function bannerDels(){try{return JSON.parse(localStorage.getItem(LSN+'bdel')||'[]')}catch(e){return[]}}
+function renderBanner(){const b=$('banner'),t=$('btext'),g=$('btag'),x=$('bx');if(!b||!t||!g||!x)return;const dels=bannerDels();const items=(DATA.banner||[]).map(v=>v&&v.text?v.text:v).filter(v=>v&&dels.indexOf(bannerHash(v))<0);if(items.length){b.className='alr';g.textContent='! ALERT';x.style.display='inline';t.style.color='';t.textContent=items.join('   ***   ');b.onclick=clearAlerts;return}b.className='idle';g.textContent='STANDBY';x.style.display='none';b.onclick=null;const news=(DATA.news||[]).map(n=>n&&n.t?n:(typeof n==='string'?{s:'NEWS',t:n}:null)).filter(Boolean);if(news.length){b.className='news';g.textContent='NEWS';t.style.color='';t.textContent=news.map(n=>'['+n.s+'] '+n.t).join('   ***   ')}else{const d=new Date(),m=d.getMonth(),dd=d.getDate();if((m===9&&dd>=29)||(m===10&&dd<=1)){t.textContent='* HAPPY HALLOWEEN * TRICK OR TREAT * PRESS START *';t.style.color='#ff9f1c'}else{t.textContent='* SYSTEM NOMINAL * NO ACTIVE ALERTS * PRESS START *';t.style.color=''}}}
+function clearAlerts(){sfx();const dels=bannerDels();(DATA.banner||[]).map(v=>v&&v.text?v.text:v).filter(Boolean).forEach(v=>{const k=bannerHash(v);if(dels.indexOf(k)<0){dels.push(k);if(fb)fb.child('banndel').child(k).set(v)}});localStorage.setItem(LSN+'bdel',JSON.stringify(dels));renderBanner()}
 /* service worker */
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 /* keep screen awake (screen wake lock, remembered per device) */
@@ -362,7 +365,7 @@ function renderRamp(){
   $('rampnote').textContent='LIMITS LIVE FROM RAMP';
 }
 function renderBills(){const bl=(DATA.bills||[]);const eb=$('expbills');if(!eb)return;eb.innerHTML=bl.length?bl.map(b=>'<div class="rbill"><span>'+esc(b.name)+' &middot; '+esc(b.due||'')+'</span><span>'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>').join(''):'<div class="tdetail">nothing due</div>'}
-function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();renderTminus();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
+function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
 render();
 </script>
 </body>
