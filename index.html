@@ -474,7 +474,6 @@ function renderHud(){const el=$('wx');if(!el)return;el.style.display='none'}
 function scoreCount(){let t=0,x=0;if(fbTD){const d=new Date(),t0=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();Object.keys(fbTD).forEach(k=>{const e=fbTD[k];const ts=e&&e.ts?e.ts:0;if(ts){x++;if(ts>=t0)t++}})}else{try{const s=JSON.parse(localStorage.getItem(LSN+'score')||'null');if(s&&s.d===new Date().toDateString()){t=s.t||0;x=s.x||0}}catch(e){}}return{t:t,x:x}}
 function scoreBump(){let s=null;try{s=JSON.parse(localStorage.getItem(LSN+'score')||'null')}catch(e){}if(!s||s.d!==new Date().toDateString())s={d:new Date().toDateString(),t:0,x:0};s.t++;s.x++;localStorage.setItem(LSN+'score',JSON.stringify(s))}
 function scoreInit(){if(!fb||!fb.child)return;fb.child('task_done').on('value',s=>{fbTD=s.val()||{};renderHud()},()=>{fbTD=null})}
-function liveTasks(){fetch('https://api.github.com/repos/ASBCINC/dashboard/issues?state=open&per_page=30').then(r=>{if(!r.ok)throw 0;return r.json()}).then(is=>{if(!Array.isArray(is)||!is.length)return;const map=is.filter(i=>!i.pull_request).map(i=>{const cat=(i.labels||[]).some(l=>String(l.name).toLowerCase().indexOf('personal')>=0)?'personal':'work';let due=null;const m=String(i.body||'').match(/DUE:\s*(\d{4}-\d{2}-\d{2})/);if(m){const d=new Date(m[1]+'T12:00:00');const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MO2=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];due=WD[d.getDay()]+' '+MO2[d.getMonth()]+' '+d.getDate()}return{n:i.number,cat:cat,title:i.title,url:i.html_url,due:due}});if(map.length){DATA.tasks=map;renderTasks()}}).catch(()=>{})}
 function renderTasks(){
   const now=new Date(),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const list=(DATA.tasks||[]).filter(t=>!isDone(t.n)&&t.cat!=='personal');
@@ -532,7 +531,7 @@ window.addEventListener('resize',fitScreen);
 window.addEventListener('orientationchange',function(){setTimeout(fitScreen,80)});
 document.addEventListener('fullscreenchange',fitScreen);
 function render(){fitBoard();fitScreen();renderCal();renderDay();renderTasks();renderMem();renderRamp();renderPipe();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
-render();fitBoard();fitScreen();renderHud();renderWx();liveTasks();setInterval(renderWx,18e5);
+render();fitBoard();fitScreen();renderHud();renderWx();setInterval(renderWx,18e5);
 </script>
 </body>
 </html>
