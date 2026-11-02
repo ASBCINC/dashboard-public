@@ -380,15 +380,19 @@ function tryPin(){if($('pinin').value===PIN){pin=$('pinin').value;localStorage.s
 function unlock(){$('gate').style.display='none';$('app').hidden=false;const n=new Date();view={y:n.getFullYear(),m:n.getMonth()};sel=iso(n);render();renderBanner();fetchData();fbInit()}
 /* data */
 async function fetchData(){
-  try{
-    const r=await fetch('https://api.github.com/gists/'+GIST+'?t='+Date.now());
-    if(!r.ok){$('calnote').textContent='OFFLINE SNAP';return}
-    const j=await r.json();
-    const f=j.files&&(j.files['data.json']||Object.values(j.files)[0]);
-    if(f&&f.content){DATA=JSON.parse(f.content);
-      
-      render();renderBanner()}
-  }catch(e){$('calnote').textContent='OFFLINE SNAP'}
+  const urls=['https://gist.githubusercontent.com/ASBCINC/'+GIST+'/raw/data.json?t='+Date.now(),'https://api.github.com/gists/'+GIST+'?t='+Date.now()];
+  let ok=false;
+  for(const u of urls){
+    try{
+      const r=await fetch(u);
+      if(!r.ok)continue;
+      let txt=null;
+      if(u.indexOf('gist.githubusercontent')>=0){txt=await r.text()}
+      else{const j=await r.json();const f=j.files&&(j.files['data.json']||Object.values(j.files)[0]);if(f&&f.content)txt=f.content}
+      if(txt){const d=JSON.parse(txt);if(d&&d.generated_at){DATA=d;ok=true;render();renderBanner();break}}
+    }catch(e){}
+  }
+  if(!ok)$('calnote').textContent='OFFLINE SNAP';
 }
 /* calendar */
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
