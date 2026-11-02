@@ -221,9 +221,9 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v==null){fb.child('mem').set(seedMem())}else{localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e))}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v){localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur=[];try{cur=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}const all=cur.slice();Object.keys(v).forEach(k=>{if(all.indexOf(k)<0)all.push(k)});localStorage.setItem(LSN+'memdel',JSON.stringify(all));render()},e=>console.warn(e))}catch(e){console.warn(e)}}
 }
-function seedMem(){const m=DATA.memorable||[];return m.length?m:null}
+function seedMem(){return []}
 function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}catch(e){return[]}}
 function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb)fb.child('mem').set(list)}
 function isDone(n){return localStorage.getItem(LSN+'done_'+n)==='1'}
@@ -248,7 +248,7 @@ async function fetchData(){
     const j=await r.json();
     const f=j.files&&(j.files['data.json']||Object.values(j.files)[0]);
     if(f&&f.content){DATA=JSON.parse(f.content);
-      if(fb&&!localStorage.getItem(LSN+'memseeded')){fb.child('mem').get().then(s=>{if(s.val()==null)fb.child('mem').set(seedMem())});localStorage.setItem(LSN+'memseeded','1')}
+      
       render();renderBanner()}
   }catch(e){$('calnote').textContent='OFFLINE SNAP'}
 }
@@ -288,7 +288,7 @@ function renderMem(){
   $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+m.cat[0]+'">'+esc(m.text)+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
 }
 function addMem(){const v=$('memin').value.trim();if(!v)return;const list=getMem();list.push({id:'u'+Date.now(),cat:$('memcat').value,text:v});setMem(list);$('memin').value='';renderMem()}
-function delMem(id){let d=[];try{d=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}if(d.indexOf(id)<0){d.push(id);localStorage.setItem(LSN+'memdel',JSON.stringify(d))}setMem(getMem().filter(m=>m.id!==id));renderMem()}
+function delMem(id){let d=[];try{d=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}if(d.indexOf(id)<0){d.push(id);localStorage.setItem(LSN+'memdel',JSON.stringify(d))}setMem(getMem().filter(m=>m.id!==id));if(fb)fb.child('memdel').child(id).set(true);renderMem()}
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
 function sendChat(){const v=$('chatin').value.trim();if(!v)return;if(!chatRef){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef.push({from:'you',text:v.slice(0,500),ts:Date.now()});$('chatin').value=''}
 function renderChat(){
