@@ -209,6 +209,49 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .psel{width:118px;font-size:8px}
   .panel.wide .wchip{font-size:11px}.panel.wide .wdate{font-size:10px}.panel.wide .fcell{font-size:11px}.panel.wide .wempty{font-size:10px}
 }
+
+/* FIT-TO-SCREEN STAGE (v20): fixed 1280x660 board, uniformly scaled to any screen */
+#app.stage{position:fixed;left:0;top:0;width:1280px;height:660px;max-width:none;max-height:none;margin:0;padding:10px 16px 6px;transform-origin:top left;overflow:hidden;font-size:15px;display:flex;flex-direction:column;gap:10px}
+#app.stage .top{flex:none}
+#app.stage h1{font-size:15px;margin:2px 0 0}
+#app.stage .sub{font-size:15px;margin-bottom:6px}
+#app.stage #wx{font-size:8px;letter-spacing:0}
+#app.stage .board{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.15fr .95fr .95fr .9fr;grid-template-rows:minmax(0,1fr) auto auto;gap:14px}
+#app.stage .two{display:contents}
+#app.stage .bot{flex:none;display:flex;justify-content:space-between;align-items:center}
+#app.stage .bot footer{margin-top:0}
+#app.stage .panel{margin-bottom:0;display:flex;flex-direction:column;min-height:0;min-width:0;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--pink),0 0 12px rgba(45,226,230,.2)}
+#app.stage .panel .ph{overflow:hidden}
+#app.stage .panel .ph span+span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+#app.stage .panel .pb{flex:1;min-height:0;overflow:auto}
+#app.stage .panel.cal{grid-column:1;grid-row:1/2;overflow:hidden}
+#app.stage .panel.cal .grid{flex:0 1 auto;min-height:0;max-height:55%;overflow:auto;padding:8px 10px;align-content:start}
+#app.stage .panel.cal .daylist{flex:1 1 0;min-height:0;overflow:auto}
+#app.stage .cell{min-height:30px}
+#app.stage .panel.tasks{grid-column:2;grid-row:1/2}
+#app.stage .panel.mem{grid-column:3;grid-row:1/2}
+#app.stage .col4stack{grid-column:4;grid-row:1/2;min-height:0;display:flex;flex-direction:column;gap:14px}
+#app.stage .col4stack .panel{min-height:0}
+#app.stage .panel.ramp{flex:1.15}
+#app.stage .panel.note{flex:none;max-height:110px}
+#app.stage .mtext,#app.stage .ttitle{font-size:15px}
+#app.stage .ph{font-size:10px;padding:8px 12px}
+#app.stage .trow{display:flex;gap:10px;padding:3px 10px}
+#app.stage .trow .tval{white-space:nowrap}
+#app.stage .mtitle{font-size:10px;white-space:nowrap}
+#app.stage .navb{font-size:9px;padding:5px 7px;white-space:nowrap}
+#app.stage .addrow select{flex:0 0 auto;width:auto;min-width:96px}
+#app.stage .addrow input{min-width:0}
+#app.stage .daylist .ev{font-size:15px}
+#app.stage .panel.wide{grid-column:1/-1;grid-row:2;flex:none;height:140px;min-height:140px;overflow:hidden}
+#app.stage .panel.wide .wchip{font-size:11px}
+#app.stage .panel.wide .wdate{font-size:10px}
+#app.stage .panel.wide .fcell{font-size:11px}
+#app.stage .panel.wide .wempty{font-size:10px}
+#app.stage .panel.pipe{grid-column:1/-1;grid-row:3;flex:none;height:150px;min-height:150px;overflow:hidden;display:flex;flex-direction:column}
+#app.stage .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:2px 4px}
+#app.stage .prow{font-size:16px;padding:3px 6px}
+
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#140a26">
@@ -481,9 +524,14 @@ function mergePipeLocal(){try{const m=JSON.parse(localStorage.getItem(LSN+'pstag
 function renderPipe(){const el=$('pipelist');if(!el)return;mergePipeLocal();const t0=new Date();t0.setHours(0,0,0,0);const arr=(DATA.pipe||[]).map(p=>{let d=null,dl=false;if(p.inst){d=new Date(p.inst+'T12:00:00');dl=!isNaN(d)&&d<t0&&p.stage!=='DONE'}return Object.assign({d:d,dl:dl},p)});const srt=(a,b)=>a.d-b.d;const delayed=arr.filter(p=>p.dl).sort(srt);const up=arr.filter(p=>p.d&&!p.dl&&p.stage!=='DONE').sort(srt);const nd=arr.filter(p=>!p.d&&p.stage!=='DONE');const dn=arr.filter(p=>p.stage==='DONE');const all=delayed.concat(up,nd,dn);const act=arr.filter(p=>p.stage!=='DONE');const tot=act.reduce((s,p)=>s+(Number(p.value)||0),0);const n=$('pnote');if(n)n.textContent=(tot?'$'+tot.toLocaleString('en-US')+' PIPELINE \u00b7 ':'')+act.length+' ACTIVE'+(delayed.length?' \u00b7 '+delayed.length+' DELAYED':'');el.innerHTML=all.map(p=>{const esc=String(p.code).replace(/'/g,"\\'");const sel='<select style="width:106px;flex:none" class="psel s-'+sCls(p.stage)+'" onchange="setPipeStage(\''+esc+'\',this.value)">'+STAGES.map(s=>'<option'+(s===p.stage?' selected':'')+'>'+s+'</option>').join('')+'</select>';const inst=p.d?pFmt(p.inst)+(p.dl?' <b class="dtag">DELAYED</b>':''):'\u2014';const ass=p.assigned?pFmt(p.assigned):'\u2014';return '<div class="prow'+(p.stage==='DONE'?' isdone':'')+(p.dl?' delayed':'')+(p.d&&!p.dl&&p.d.getTime()===t0.getTime()?' today':'')+'">'+sel+'<span class="pname">'+p.code+(p.name?' <i>'+p.name+'</i>':'')+'</span><span class="passn">'+ass+'</span><span class="pins">'+inst+'</span><span class="pval">'+pMoney(p.value)+'</span></div>'}).join('')||'<div class="pempty">NO PROJECTS IN PIPELINE YET</div>'}
 function setPipeStage(code,stage){sfx();const p=(DATA.pipe||[]).find(x=>x.code===code);if(p)p.stage=stage;try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');m[code]=stage;localStorage.setItem(LSN+'pstage',JSON.stringify(m))}catch(e){}if(fb){try{fb.child('pipe').child(code).set({stage:stage,ts:Date.now()})}catch(e){}}renderPipe()}
 function fitBoard(){const b=document.querySelector('.board');if(!b)return;const mq=window.matchMedia('(min-width:700px) and (orientation:landscape)');if(!mq.matches){b.style.gridTemplateRows='';return}const top=document.querySelector('.top'),bot=document.querySelector('.bot');const fx=window.matchMedia('(min-width:1100px) and (orientation:landscape) and (min-height:820px)').matches?386:318;const pad=36;const h=window.innerHeight-(top?top.offsetHeight:0)-(bot?bot.offsetHeight:0)-pad-fx;b.style.gridTemplateRows=Math.max(170,h)+'px auto auto'}
+
+function fitScreen(){const app=$('app');if(!app||app.hidden)return;const b=document.querySelector('.board');const mq=window.matchMedia('(min-width:700px) and (orientation:landscape)');const fluid=mq.matches&&window.innerHeight>=620;if(fluid){app.classList.remove('stage');app.style.transform='';app.style.left='';app.style.top='';fitBoard();return}app.classList.add('stage');const w=window.innerWidth,h=window.innerHeight;const k=Math.min(w/1280,h/660);app.style.transform='scale('+k+')';app.style.left=Math.max(0,(w-1280*k)/2)+'px';app.style.top=Math.max(0,(h-660*k)/2)+'px';if(b)b.style.gridTemplateRows=''}
 window.addEventListener('resize',fitBoard);
-function render(){fitBoard();renderCal();renderDay();renderWeek();renderTasks();renderMem();renderRamp();renderPipe();renderFc();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
-render();fitBoard();renderHud();renderWx();liveTasks();setInterval(renderWx,18e5);
+window.addEventListener('resize',fitScreen);
+window.addEventListener('orientationchange',function(){setTimeout(fitScreen,80)});
+document.addEventListener('fullscreenchange',fitScreen);
+function render(){fitBoard();fitScreen();renderCal();renderDay();renderWeek();renderTasks();renderMem();renderRamp();renderPipe();renderFc();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
+render();fitBoard();fitScreen();renderHud();renderWx();liveTasks();setInterval(renderWx,18e5);
 </script>
 </body>
 </html>
