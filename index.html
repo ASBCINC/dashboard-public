@@ -49,6 +49,26 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .daylist .tm{color:var(--dim);min-width:76px}
 .daylist .w{color:var(--red)}.daylist .p{color:var(--yellow)}.daylist .h{color:var(--blue)}
 .daylist .et.w{color:var(--red)}.daylist .et.p{color:var(--yellow)}.daylist .et.h{color:var(--blue)}
+/* project pipeline */
+.panel.pipe{max-height:210px;display:flex;flex-direction:column;overflow:hidden}
+.prow{display:flex;align-items:center;gap:8px;padding:3px 6px;border-bottom:1px solid rgba(255,255,255,.07);font-size:16px}
+.prow:last-child{border-bottom:none}
+.prow.delayed{border-left:3px solid var(--red);background:rgba(255,75,75,.07)}
+.prow.today{border-left:3px solid var(--pink)}
+.prow.isdone{opacity:.4}
+.psel{font-family:'Press Start 2P';font-size:7px;background:#0d0620;padding:4px 2px;border:2px solid var(--cyan);cursor:pointer;flex:none;width:106px;color:var(--cyan)}
+.psel.s-s{color:var(--yellow);border-color:var(--yellow)}
+.psel.s-p{color:var(--pink);border-color:var(--pink)}
+.psel.s-u{color:var(--red);border-color:var(--red)}
+.psel.s-d{color:var(--green);border-color:var(--green)}
+.pname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.pname i{font-style:normal;color:rgba(232,230,255,.6);font-size:14px}
+.passn,.pins,.pval{flex:none;text-align:right;white-space:nowrap}
+.passn{width:66px;color:rgba(232,230,255,.75)}
+.pins{width:118px;color:#fff}
+.pval{width:78px;color:var(--green)}
+.dtag{color:var(--red);font-family:'Press Start 2P';font-size:7px;margin-left:4px}
+.pempty{color:var(--dim);opacity:.5;padding:8px 6px}
 /* tasks */
 .titem{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #4a2f8a}
 .titem:last-child{border-bottom:none}
@@ -142,7 +162,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .top{flex:none}
   h1{font-size:15px;margin:2px 0 0}
   .sub{font-size:15px;margin-bottom:6px}
-  .board{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.15fr .95fr .95fr .9fr;grid-template-rows:minmax(0,1fr) auto;gap:14px}
+  .board{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.15fr .95fr .95fr .9fr;grid-template-rows:minmax(0,1fr) auto auto;gap:14px}
   .two{display:contents}
   .bot{flex:none;display:flex;justify-content:space-between;align-items:center}
   .bot footer{margin-top:0}
@@ -172,6 +192,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .addrow input{min-width:0}
   #wx{font-size:8px;letter-spacing:0}
   .panel.wide{grid-column:1/-1;grid-row:2;flex:none;height:140px;min-height:140px;overflow:hidden}
+  .panel.pipe{grid-column:1/-1;grid-row:3;flex:none;height:150px;min-height:150px;overflow:hidden;display:flex;flex-direction:column}
+  .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:2px 4px}
   .daylist .ev{font-size:15px}
 }
 @media (min-width:1100px) and (orientation:landscape) and (min-height:820px){
@@ -181,6 +203,10 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   #wx{font-size:9px;letter-spacing:1px}
   .panel.note{flex:none;max-height:175px}
   .panel.wide{height:172px}
+  .panel.pipe{height:186px}
+  .prow{font-size:18px;padding:5px 6px}
+  .pname i{font-size:16px}
+  .psel{width:118px;font-size:8px}
   .panel.wide .wchip{font-size:11px}.panel.wide .wdate{font-size:10px}.panel.wide .fcell{font-size:11px}.panel.wide .wempty{font-size:10px}
 }
 </style>
@@ -245,6 +271,11 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div class="widerow" id="weekrow"></div>
     <div class="fcrow" id="fcrow"></div>
   </div>
+
+  <div class="panel pipe">
+    <div class="ph" style="color:var(--cyan)"><span>PROJECT PIPELINE</span><span id="pnote" style="font-size:9px;color:var(--yellow)">LOADING...</span></div>
+    <div class="pipelist" id="pipelist"></div>
+  </div>
 </div>
 
   <div id="evmodal" onclick="if(event.target===this)closeAddEv()">
@@ -308,7 +339,7 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);scoreInit();const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v){localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur=[];try{cur=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}const all=cur.slice();Object.keys(v).forEach(k=>{if(all.indexOf(k)<0)all.push(k)});localStorage.setItem(LSN+'memdel',JSON.stringify(all));render()},e=>console.warn(e))}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);scoreInit();const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v){localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur=[];try{cur=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}const all=cur.slice();Object.keys(v).forEach(k=>{if(all.indexOf(k)<0)all.push(k)});localStorage.setItem(LSN+'memdel',JSON.stringify(all));render()},e=>console.warn(e)),fb.child('pipe').on('value',s=>{const v=s.val()||{};let ch=false;(DATA.pipe||[]).forEach(p=>{const q=v[p.code];if(q&&q.stage&&q.stage!==p.stage){p.stage=q.stage;ch=true}});if(ch)renderPipe()},e=>console.warn(e))}catch(e){console.warn(e)}}
 }
 function seedMem(){return []}
 function getMem(){try{return JSON.parse(localStorage.getItem(LSN+'mem'))||[]}catch(e){return[]}}
@@ -437,7 +468,15 @@ function renderRamp(){
   bp.innerHTML=items.length?items.map(b=>'<div class="rbill"><span>'+esc(b.name)+' &middot; '+esc(b.date||'')+(b.status?' <span style="color:var(--dim)">'+esc(b.status)+'</span>':'')+'</span><span>'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>').join(''):'<div class="tdetail">nothing pending</div>';
   $('rampnote').textContent='LIMITS LIVE FROM RAMP';
 }
-function render(){renderCal();renderDay();renderWeek();renderTasks();renderMem();renderRamp();renderFc();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
+/* project pipeline (V16) */
+const STAGES=['QUOTED','SCHEDULED','IN PROGRESS','PUNCH LIST','DONE'];
+function sCls(s){return s==='QUOTED'?'q':s==='SCHEDULED'?'s':s==='IN PROGRESS'?'p':s==='PUNCH LIST'?'u':'d'}
+function pFmt(s){if(!s)return'';const d=new Date(s+'T12:00:00');if(isNaN(d))return s;const W=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return W[d.getDay()]+' '+M[d.getMonth()]+' '+d.getDate()}
+function pMoney(v){return v==null||v===''||isNaN(Number(v))?'\u2014':'$'+Number(v).toLocaleString('en-US')}
+function mergePipeLocal(){try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');(DATA.pipe||[]).forEach(p=>{if(m[p.code])p.stage=m[p.code]})}catch(e){}}
+function renderPipe(){const el=$('pipelist');if(!el)return;mergePipeLocal();const t0=new Date();t0.setHours(0,0,0,0);const arr=(DATA.pipe||[]).map(p=>{let d=null,dl=false;if(p.inst){d=new Date(p.inst+'T12:00:00');dl=!isNaN(d)&&d<t0&&p.stage!=='DONE'}return Object.assign({d:d,dl:dl},p)});const srt=(a,b)=>a.d-b.d;const delayed=arr.filter(p=>p.dl).sort(srt);const up=arr.filter(p=>p.d&&!p.dl&&p.stage!=='DONE').sort(srt);const nd=arr.filter(p=>!p.d&&p.stage!=='DONE');const dn=arr.filter(p=>p.stage==='DONE');const all=delayed.concat(up,nd,dn);const act=arr.filter(p=>p.stage!=='DONE');const tot=act.reduce((s,p)=>s+(Number(p.value)||0),0);const n=$('pnote');if(n)n.textContent=(tot?'$'+tot.toLocaleString('en-US')+' PIPELINE \u00b7 ':'')+act.length+' ACTIVE'+(delayed.length?' \u00b7 '+delayed.length+' DELAYED':'');el.innerHTML=all.map(p=>{const esc=String(p.code).replace(/'/g,"\\'");const sel='<select class="psel s-'+sCls(p.stage)+'" onchange="setPipeStage(\''+esc+'\',this.value)">'+STAGES.map(s=>'<option'+(s===p.stage?' selected':'')+'>'+s+'</option>').join('')+'</select>';const inst=p.d?pFmt(p.inst)+(p.dl?' <b class="dtag">DELAYED</b>':''):'\u2014';const ass=p.assigned?pFmt(p.assigned):'\u2014';return '<div class="prow'+(p.stage==='DONE'?' isdone':'')+(p.dl?' delayed':'')+(p.d&&!p.dl&&p.d.getTime()===t0.getTime()?' today':'')+'">'+sel+'<span class="pname">'+p.code+(p.name?' <i>'+p.name+'</i>':'')+'</span><span class="passn">'+ass+'</span><span class="pins">'+inst+'</span><span class="pval">'+pMoney(p.value)+'</span></div>'}).join('')||'<div class="pempty">NO PROJECTS IN PIPELINE YET</div>'}
+function setPipeStage(code,stage){sfx();const p=(DATA.pipe||[]).find(x=>x.code===code);if(p)p.stage=stage;try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');m[code]=stage;localStorage.setItem(LSN+'pstage',JSON.stringify(m))}catch(e){}if(fb){try{fb.child('pipe').child(code).set({stage:stage,ts:Date.now()})}catch(e){}}renderPipe()}
+function render(){renderCal();renderDay();renderWeek();renderTasks();renderMem();renderRamp();renderPipe();renderFc();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16))}
 render();renderHud();renderWx();liveTasks();setInterval(renderWx,18e5);
 </script>
 </body>
