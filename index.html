@@ -102,7 +102,8 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .star{color:var(--yellow);font-size:20px}
 .mtext{flex:1;font-size:20px}
 .mtext.w{color:var(--cyan)}.mtext.p{color:var(--pink)}.mtext.n{color:var(--yellow)}
-.panel.mem{display:flex;flex-direction:column;border-bottom:3px solid var(--cyan);padding:0}
+.panel.mem{display:flex;flex-direction:column;align-items:stretch;border-bottom:3px solid var(--cyan);padding:0}
+.panel.mem .pb{min-width:0;overflow:hidden}
 .panel.mem .tt{min-width:0}
 .panel.mem .titem{cursor:pointer}
 .panel.mem .ttitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere}
@@ -494,7 +495,7 @@ function renderTasks(){
 /* memorable */
 function memOpen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'memopen')||'{}')}catch(e){}return o}
 function toggleMem(id){const o=memOpen();o[id]=!o[id];localStorage.setItem(LSN+'memopen',JSON.stringify(o));renderMem()}
-function memSplit(t){t=String(t||'');if(t.indexOf('NEW PROJECT: ')===0){const r=t.slice(13),i=r.indexOf(' ');return ['NEW: '+(i>0?r.slice(0,i):r),r]}const i=t.indexOf(': ');if(i>0&&i<40&&/^[\w\-\[\] ]+$/.test(t.slice(0,i)))return [t.slice(0,i),t.slice(i+2)];return [t,'']}
+function memSplit(t){t=String(t||'');if(t.indexOf('NEW PROJECT: ')===0){const r=t.slice(13),i=r.indexOf(' ');return ['NEW: '+(i>0?r.slice(0,i):r),r]}const i=t.indexOf(': ');if(i>0&&i<60&&/^[\w\-\[\] ]+$/.test(t.slice(0,i)))return [t.slice(0,i),t.slice(i+2)];return [t,'']}
 function renderMem(){
   let dels=[];try{dels=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}
   const seen={};let list=[];
