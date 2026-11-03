@@ -96,6 +96,11 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .msg.you{align-self:flex-end;border-color:var(--pink);background:#2a0f22}
 .msg.fo{align-self:flex-start;border-color:var(--cyan);background:#0c2430}
 .msg .who{font-family:'Press Start 2P';font-size:8px;display:block;margin-bottom:3px;color:var(--dim)}
+function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return (h>>>0).toString(36)}
+function topen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'topen')||'{}')}catch(e){}return o}
+function toggleTsk(id){sfx();const o=topen();o[id]=!o[id];localStorage.setItem(LSN+'topen',JSON.stringify(o));renderTasks()}
+function ropen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'ropen')||'{}')}catch(e){}return o}
+function toggleRamp(id){sfx();const o=ropen();o[id]=!o[id];localStorage.setItem(LSN+'ropen',JSON.stringify(o));renderRamp()}
 /* memorable */
 .mem{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #4a2f8a}
 .mem:last-child{border-bottom:none}
@@ -109,6 +114,15 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .panel.mem .ttitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere}
 .panel.mem .titem.open .ttitle{white-space:normal;overflow:visible;text-overflow:clip}
 .panel.mem .tdetail{margin-top:4px}
+.panel.tasks .tt{min-width:0}
+.panel.tasks .titem{cursor:pointer}
+.panel.tasks .ttitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere}
+.panel.tasks .titem.open .ttitle{white-space:normal;overflow:visible;text-overflow:clip}
+.rbill{cursor:pointer}
+.rbill .bwrap{flex:1;min-width:0;display:block}
+.rbill .bname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;overflow-wrap:anywhere}
+.rbill .bdet{display:block;color:var(--dim);font-size:14px;margin-top:2px}
+.rbill .bamt{flex:none;white-space:nowrap}
 .x{color:var(--dim);cursor:pointer;font-family:'Press Start 2P';font-size:10px;padding:4px}
 .x:hover{color:var(--pink)}
 .addrow{display:flex;gap:8px;margin-top:10px}
@@ -490,7 +504,7 @@ function renderTasks(){
   list.sort((a,b)=>a._k-b._k);
   const w=list.length,tc=$('tcount');
   if(tc)tc.textContent=list.length?list.length+' OPEN \u00b7 '+w+' WORK':'';
-  $('alltasks').innerHTML=list.length?list.map(x=>'<div class="titem'+(x._od?' od':'')+'"><div class="pxbox" onclick="setDone('+x.n+','+!isDone(x.n)+')"></div><span class="tcat '+(x.cat==='personal'?'p':'w')+'">'+(x.cat==='personal'?'PERS':'WORK')+'</span><div class="tt"><div class="ttitle">'+esc(x.title)+'</div>'+(x.detail?'<div class="tdetail">'+esc(x.detail)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>').join(''):'<div class="tdetail">nothing here.</div>';
+  $('alltasks').innerHTML=list.length?list.map(x=>{const sp=memSplit(x.title);const det=(sp[1]?sp[1]+(x.detail?' \u2014 '+x.detail:''):x.detail);const tid='t'+x.n;const open=!!topen()[tid];const title=(open&&det)?x.title:((sp[1]?((open?'\u25be ':'\u25b8 ')+sp[0]):x.title));return '<div class="titem'+(x._od?' od':'')+(open?' open':'')+'" onclick="toggleTsk(\''+tid+'\')"><div class="pxbox" onclick="event.stopPropagation();setDone('+x.n+','+!isDone(x.n)+')"></div><span class="tcat '+(x.cat==='personal'?'p':'w')+'">'+(x.cat==='personal'?'PERS':'WORK')+'</span><div class="tt"><div class="ttitle">'+esc(title)+'</div>'+((open&&det)?'<div class="tdetail">'+esc(det)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>'}).join(''):'<div class="tdetail">nothing here.</div>';
 }
 /* memorable */
 function memOpen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'memopen')||'{}')}catch(e){}return o}
@@ -518,7 +532,8 @@ function renderRamp(){
   if(!r||!r.funds||!r.funds.length){fp.innerHTML='<div class="tdetail">no ramp data yet</div>';bp.innerHTML='';$('rampnote').textContent='';return}
   fp.innerHTML=r.funds.map(f=>{const pct=f.limit?Math.min(100,Math.round(f.spent/f.limit*100)):0;const col=pct>=90?'var(--red)':pct>=75?'var(--yellow)':'var(--pink)';const left=f.limit-f.spent;return '<div class="rfund" title="spent '+fmtUSD(f.spent)+' of '+fmtUSD(f.limit)+'"><div class="rline"><span>'+esc(f.name)+'</span><span>'+fmtUSD(left)+' LEFT</span></div><div class="rbar"><div class="rfill" style="width:'+pct+'%;background:'+col+'"></div></div></div>'}).join('');
   const items=r.items||[];
-  bp.innerHTML=items.length?items.map(b=>'<div class="rbill"><span>'+esc(b.name)+' &middot; '+esc(b.date||'')+(b.status?' <span style="color:var(--dim)">'+esc(b.status)+'</span>':'')+'</span><span>'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>').join(''):'<div class="tdetail">nothing pending</div>';
+  const ro=ropen();
+  bp.innerHTML=items.length?items.map(b=>{const nm=String(b.name||'');const ip=nm.indexOf(' (');const short=ip>0?nm.slice(0,ip):nm;const rest=ip>0?nm.slice(ip+1):'';const rid='r'+djb2(nm+'|'+(b.date||''));const open=!!ro[rid];const det=[rest,b.date||'',b.status||''].filter(Boolean).join(' \u00b7 ');return '<div class="rbill'+(open?' open':'')+'" onclick="toggleRamp(\''+rid+'\')"><div class="bwrap"><span class="bname">'+esc(short)+'</span>'+((open&&det)?'<span class="bdet">'+esc(det)+'</span>':'')+'</div><span class="bamt">'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>'}).join(''):'<div class="tdetail">nothing pending</div>';
   $('rampnote').textContent='LIMITS LIVE FROM RAMP';
 }
 /* project pipeline (V16) */
