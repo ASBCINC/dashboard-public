@@ -96,11 +96,6 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .msg.you{align-self:flex-end;border-color:var(--pink);background:#2a0f22}
 .msg.fo{align-self:flex-start;border-color:var(--cyan);background:#0c2430}
 .msg .who{font-family:'Press Start 2P';font-size:8px;display:block;margin-bottom:3px;color:var(--dim)}
-function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return (h>>>0).toString(36)}
-function topen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'topen')||'{}')}catch(e){}return o}
-function toggleTsk(id){sfx();const o=topen();o[id]=!o[id];localStorage.setItem(LSN+'topen',JSON.stringify(o));renderTasks()}
-function ropen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'ropen')||'{}')}catch(e){}return o}
-function toggleRamp(id){sfx();const o=ropen();o[id]=!o[id];localStorage.setItem(LSN+'ropen',JSON.stringify(o));renderRamp()}
 /* memorable */
 .mem{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #4a2f8a}
 .mem:last-child{border-bottom:none}
@@ -506,6 +501,11 @@ function renderTasks(){
   if(tc)tc.textContent=list.length?list.length+' OPEN \u00b7 '+w+' WORK':'';
   $('alltasks').innerHTML=list.length?list.map(x=>{const sp=memSplit(x.title);const det=(sp[1]?sp[1]+(x.detail?' \u2014 '+x.detail:''):x.detail);const tid='t'+x.n;const open=!!topen()[tid];const title=(open&&det)?x.title:((sp[1]?((open?'\u25be ':'\u25b8 ')+sp[0]):x.title));return '<div class="titem'+(x._od?' od':'')+(open?' open':'')+'" onclick="toggleTsk(\''+tid+'\')"><div class="pxbox" onclick="event.stopPropagation();setDone('+x.n+','+!isDone(x.n)+')"></div><span class="tcat '+(x.cat==='personal'?'p':'w')+'">'+(x.cat==='personal'?'PERS':'WORK')+'</span><div class="tt"><div class="ttitle">'+esc(title)+'</div>'+((open&&det)?'<div class="tdetail">'+esc(det)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>'}).join(''):'<div class="tdetail">nothing here.</div>';
 }
+function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return (h>>>0).toString(36)}
+function topen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'topen')||'{}')}catch(e){}return o}
+function toggleTsk(id){sfx();const o=topen();o[id]=!o[id];localStorage.setItem(LSN+'topen',JSON.stringify(o));renderTasks()}
+function ropen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'ropen')||'{}')}catch(e){}return o}
+function toggleRamp(id){sfx();const o=ropen();o[id]=!o[id];localStorage.setItem(LSN+'ropen',JSON.stringify(o));renderRamp()}
 /* memorable */
 function memOpen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'memopen')||'{}')}catch(e){}return o}
 function toggleMem(id){const o=memOpen();o[id]=!o[id];localStorage.setItem(LSN+'memopen',JSON.stringify(o));renderMem()}
