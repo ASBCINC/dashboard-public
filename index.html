@@ -166,6 +166,8 @@ footer{font-family:'Press Start 2P';font-size:9px;color:var(--dim);text-align:ce
 .tcat{font-family:'Press Start 2P';font-size:8px;flex:none;padding:3px 6px;border:2px solid;margin-top:2px}
 .tcat.w{color:var(--cyan);border-color:var(--cyan)}
 .tcat.p{color:var(--pink);border-color:var(--pink)}
+.tcat.y{color:var(--yellow);border-color:var(--yellow)}
+.ttitle.mnew{color:var(--yellow)}
 .titem.od .ttitle{color:var(--red)}
 #wx{font-family:'Press Start 2P';font-size:8px;color:var(--cyan);text-align:center;margin:1px 0 3px;letter-spacing:1px}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 1px 3px)}
@@ -291,7 +293,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   <div class="panel tasks"><div class="ph" style="color:var(--cyan)"><span>TASKS</span><span id="tcount" style="color:var(--yellow);font-size:9px"></span></div><div class="pb" id="alltasks"></div></div>
 
   <div class="panel mem">
-    <div class="ph"><span>HIGHLIGHTS</span></div>
+    <div class="ph" style="color:var(--cyan)"><span>UPDATES</span><span id="mcount" style="color:var(--yellow);font-size:9px"></span></div>
     <div class="pb">
       <div id="mems"></div>
     </div>
@@ -489,7 +491,8 @@ function renderMem(){
   const seen={};let list=[];
   (DATA.memorable||[]).forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
   getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
-  $('mems').innerHTML=list.map(m=>'<div class="mem"><span class="star">&#9733;</span><span class="mtext '+(m.k==='new'?'n':((m.cat||'w')[0]))+'">'+esc(m.t||m.text||m.title||'')+'</span><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here yet.</div>';
+  const mc=$('mcount');if(mc)mc.textContent=list.length?list.length+' ITEMS':'';
+  $('mems').innerHTML=list.map(m=>'<div class="titem"><span class="tcat '+(m.k==='new'?'y':((m.cat||'w')[0]))+'">'+(m.k==='new'?'NEW':'UPD')+'</span><div class="tt"><div class="ttitle'+(m.k==='new'?' mnew':'')+'">'+esc(m.t||m.text||m.title||'')+'</div></div><span class="x" onclick="delMem(\''+m.id+'\')">X</span></div>').join('')||'<div class="tdetail">nothing here.</div>';
 }
 function delMem(id){let d=[];try{d=JSON.parse(localStorage.getItem(LSN+'memdel')||'[]')}catch(e){}if(d.indexOf(id)<0){d.push(id);localStorage.setItem(LSN+'memdel',JSON.stringify(d))}setMem(getMem().filter(m=>m.id!==id));if(fb)fb.child('memdel').child(id).set(true);renderMem()}
 function chatInit(){if(!fb){$('chatnote').textContent='CHAT NEEDS FIREBASE';return}chatRef=fb.child('chat');chatRef.on('value',s=>{const v=s.val();if(v){chatData=v;renderChat()}},e=>{$('chatnote').textContent='CHAT OFFLINE'})}
