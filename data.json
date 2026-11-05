@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04T13:05:00-08:00",
+ "generated_at": "2026-11-05T14:01:51-08:00",
  "tasks": [
   {
    "n": "49",
@@ -561,6 +561,48 @@
    "value": 137351.13,
    "labor": 5600.0,
    "paid": null
+  }
+ ],
+ "suggestions": [
+  {
+   "t": "TFS: Nov on track",
+   "note": "$1,300 by Nov 20 - 3 of 4 in (Oct 16, Oct 23, Nov 5 early); Nov 13 next",
+   "kind": "fin"
+  },
+  {
+   "t": "TFS: December",
+   "note": "filled by the Nov 20, Nov 27, Dec 4 and Dec 11 weekly payments",
+   "kind": "fin"
+  },
+  {
+   "t": "USAA car insurance",
+   "note": "$974.68 still owed since Nov 2 - pay to keep the policy clear",
+   "kind": "fin"
+  },
+  {
+   "t": "Paramount+",
+   "note": "decide keep or cancel by Nov 25 (renews Nov 26)",
+   "kind": "fin"
+  },
+  {
+   "t": "Dates ahead",
+   "note": "anniversary May 8 - Anthony Jun 5 - Madi Aug 6 - Jojo Aug 30 - first kiss Sep 23",
+   "kind": "date"
+  },
+  {
+   "t": "Christmas prep",
+   "note": "gift ideas for Clarissa + the kids by ~Nov 25",
+   "kind": "shop"
+  },
+  {
+   "t": "Thanksgiving",
+   "note": "Thu Nov 26 - family day",
+   "kind": "date"
+  },
+  {
+   "t": "Requests",
+   "note": "Clarissa calendar share pending - her events join the dashboard in green",
+   "kind": "req"
   }
  ]
 }
