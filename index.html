@@ -49,7 +49,7 @@ h1{font-family:'Press Start 2P';font-size:21px;color:var(--yellow);text-shadow:3
 .daylist .w{color:var(--red)}.daylist .p{color:var(--yellow)}.daylist .h{color:var(--blue)}
 .daylist .et.w{color:var(--red)}.daylist .et.p{color:var(--yellow)}.daylist .et.h{color:var(--blue)}
 /* project pipeline */
-.panel.pipe{display:flex;flex-direction:column;overflow:hidden}
+.panel.sug{display:flex;flex-direction:column;overflow:hidden}
 .prow{display:flex;flex-direction:column;gap:2px;padding:4px 6px;border:1px solid rgba(255,255,255,.12);border-radius:4px;background:rgba(255,255,255,.03);font-size:13px;min-width:0}
 .prow:last-child{border-bottom:none}
 .prow.delayed{border-color:var(--red);background:rgba(255,75,75,.1)}
@@ -225,8 +225,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   .addrow select{flex:0 0 auto;width:auto;min-width:96px}
   .addrow input{min-width:0}
   #wx{font-size:8px;letter-spacing:0}
-  .panel.pipe{grid-column:1/-1;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-  .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;grid-auto-rows:1fr}
+  .panel.sug{grid-column:1/-1;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  .panel.sug .suglist{flex:1;min-height:0;overflow:auto;padding:6px 8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;grid-auto-rows:min-content;align-content:start}
   .daylist .ev{font-size:15px}
 }
 @media (min-width:1100px) and (orientation:landscape) and (min-height:820px){
@@ -278,10 +278,14 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
 #app.stage .panel.wide .wdate{font-size:10px}
 #app.stage .panel.wide .fcell{font-size:11px}
 #app.stage .panel.wide .wempty{font-size:10px}
-#app.stage .panel.pipe{grid-column:1/-1;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-#app.stage .panel.pipe .pipelist{flex:1;min-height:0;overflow:auto;padding:3px 5px;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;grid-auto-rows:1fr}
+#app.stage .panel.sug{grid-column:1/-1;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+#app.stage .panel.sug .suglist{flex:1;min-height:0;overflow:auto;padding:6px 8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;grid-auto-rows:min-content;align-content:start}
 #app.stage .prow{font-size:13px;padding:4px 6px}
 
+.ttitle.cg{color:var(--green)}
+.ttitle.cf{color:var(--pink)}
+.dot.f{background:var(--green)}.daylist .et.f{color:var(--green)}.daylist .tm.f{color:var(--green)}
+.rbill.od .bname,.rbill.od .bamt{color:var(--red)}
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#140a26">
@@ -310,42 +314,41 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;b
   <div class="panel tasks"><div class="ph" style="color:var(--cyan)"><span>TASKS</span><span id="tcount" style="color:var(--yellow);font-size:9px"></span></div><div class="pb" id="alltasks"></div></div>
 
   <div class="panel mem">
-    <div class="ph" style="color:var(--cyan)"><span>UPDATES</span><span id="mcount" style="color:var(--yellow);font-size:9px"></span></div>
+    <div class="ph" style="color:var(--cyan)"><span>REMINDERS</span><span id="mcount" style="color:var(--yellow);font-size:9px"></span></div>
     <div class="pb">
       <div id="mems"></div>
     </div>
   </div>
 
   <div class="col4stack">
-  <div class="panel ramp">
-    <div class="ph"><span>RAMP SPEND</span><span id="rampnote" style="font-size:9px"></span></div>
-    <div class="pb">
-      <div id="rampfunds"></div>
-      <div class="rsub">OPEN EXPENSES</div>
-      <div id="rampbills"></div>
-    </div>
+    <div class="panel fin">
+    <div class="ph"><span>FINANCES</span><span id="bnote" style="font-size:9px"></span></div>
+    <div class="pb"><div id="billslist"></div></div>
+  </div>
+
+  <div class="panel fam">
+    <div class="ph" style="color:var(--pink)"><span>FAMILY</span></div>
+    <div class="pb"><div id="famlist"></div></div>
   </div>
 
   </div>
 
-  <div class="panel pipe">
-    <div class="ph" style="color:var(--cyan)"><span>PROJECT PIPELINE</span><span id="pnote" style="font-size:9px;color:var(--yellow)">LOADING...</span></div>
-    <div class="pipelist" id="pipelist"></div>
+    <div class="panel sug">
+    <div class="ph" style="color:var(--green)"><span>SUGGESTIONS</span><span id="snote" style="font-size:9px;color:var(--yellow)"></span></div>
+    <div class="suglist" id="suglist"></div>
   </div>
-</div>
 
   <div id="evmodal" onclick="if(event.target===this)closeAddEv()">
   <div class="evbox">
-    <div class="ph" style="color:var(--yellow);border-color:var(--yellow)"><span>ADD D-TOOLS EVENT</span><span class="x" style="cursor:pointer" onclick="closeAddEv()">X</span></div>
+    <div class="ph" style="color:var(--yellow);border-color:var(--yellow)"><span>ADD EVENT</span><span class="x" style="cursor:pointer" onclick="closeAddEv()">X</span></div>
     <div class="evform">
       <input id="evname" placeholder="event name">
       <div class="evrow"><input id="evdate" type="date"><select id="evstart"></select><select id="evend"></select></div>
       <input id="evloc" placeholder="location">
       <input id="evatt" placeholder="required attendees (comma separated)">
-      <select id="evp"></select>
-      <div class="evrow"><button class="addb" onclick="submitAddEv()">SUBMIT</button><button class="addb" onclick="closeAddEv()">CANCEL</button></div>
+            <div class="evrow"><button class="addb" onclick="submitAddEv()">SUBMIT</button><button class="addb" onclick="closeAddEv()">CANCEL</button></div>
       <div id="evstat" class="tdetail"></div>
-      <div class="tdetail" style="font-size:14px">SUBMITS TO FO. ENTERED INTO THE D-TOOLS CALENDAR ON THE NEXT SWEEP.</div>
+      <div class="tdetail" style="font-size:14px">SUBMITS TO FO. GOES ON YOUR GOOGLE CALENDAR AFTER THE NEXT SWEEP.</div>
     </div>
   </div>
 </div>
@@ -365,17 +368,14 @@ try{DATA=JSON.parse(document.getElementById('snap').textContent)}catch(e){DATA={
 const $=id=>document.getElementById(id);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LSN='fo_dash_';
-const DTP={'JS-Dhablania-01689':'50504','TP-Ramadoss-01671':'48537','BC-Beth-01692':'51385','NG-Koh-01734':'52876','MS-Alexander-01737':'52962','GC-Brazier-01687':'51619','GC-Yong-01472':'50991','NS-Zabriskie-01666':'51484','TP-Gottwald-01698':'52113','JM-Petros-01745':'53052','MS-Escalante-01670':'51687','NG-Tamura-01675':'51607','JS-Brian Asher-01361':'50092','TC-Rees-01725':'52587','MS-Aztech-01654-1476':'50793','SS-Kumar-01744':'48440'};
-const REP={'TP-Ramadoss-01671':'Timothy Parks','MS-Alexander-01737':'Miguel Sandoval','JS-Dhablania-01689':'Josh Silva','NS-Zabriskie-01666':'Noel Salinas','BC-Beth-01692':'Brian Chan','TP-Gottwald-01698':'Timothy Parks','JM-Petros-01745':'Jonathan Model','GC-Brazier-01687':'Gabriel Clark','MS-Escalante-01670':'Miguel Sandoval','MS-Aztech-01654-1476':'Miguel Sandoval','NG-Tamura-01675':'Nawel Girma','JS-Brian Asher-01361':'Josh Silva','NG-Koh-01734':'Nawel Girma','TC-Rees-01725':'Tom Cisper'};
-function dtLink(e){const t=e.title||'';for(const k in DTP){if(t.indexOf(k)>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Project&RedirectToId='+DTP[k]+'" target="_blank" rel="noopener">[OPEN PROJECT]</a>'}if(t.indexOf('(D-Tools)')>=0)return ' <a class="evlink" href="https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Schedule&RedirectToId='+(e.date||'')+'" target="_blank" rel="noopener">[OPEN D-TOOLS]</a>';return ''}
 const HOLIDS=["new year","martin luther king","mlk day","presidents day","washington's birthday","memorial day","juneteenth","independence day","labor day","columbus day","indigenous peoples","veterans day","thanksgiving","christmas","halloween","valentine","st. patrick","easter","mother's day","father's day","daylight saving time","election day","inauguration day","good friday","passover","hanukkah","yom kippur","rosh hashanah","kwanzaa","earth day","april fools","casimir pulaski","cesar chavez","mardi gras","cinco de mayo","flag day","juneteenth"];
 function catOf(e){if(!e)return 'w';if(e.cat==='holiday')return 'h';const t=(e.title||'').toLowerCase();for(const n of HOLIDS){if(t.indexOf(n)>=0)return 'h'}return e.cat[0]||'w'}
 function timeOpts(){let h='';for(let i=6;i<=21;i++){for(const m of ['00','30']){const hh=i>12?i-12:i;h+='<option value="'+String(i).padStart(2,'0')+':'+m+'">'+hh+':'+m+' '+(i<12?'AM':'PM')+'</option>'}}return h+'<option value="22:00">10:00 PM</option>'}
-function openAddEv(){$('evmodal').style.display='flex';$('evdate').value=sel||iso(new Date());$('evstart').innerHTML=timeOpts();$('evend').innerHTML=timeOpts();$('evstart').value='09:00';$('evend').value='10:00';$('evp').innerHTML='<option value="">(no project)</option>'+Object.keys(DTP).map(k=>'<option>'+k+'</option>').join('');$('evstat').textContent='';$('evname').value='';$('evloc').value='';$('evatt').value=''}
+function openAddEv(){$('evmodal').style.display='flex';$('evdate').value=sel||iso(new Date());$('evstart').innerHTML=timeOpts();$('evend').innerHTML=timeOpts();$('evstart').value='09:00';$('evend').value='10:00';$('evstat').textContent='';$('evname').value='';$('evloc').value='';$('evatt').value=''}
 function closeAddEv(){$('evmodal').style.display='none'}
-function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').value,start=$('evstart').value,end=$('evend').value,loc=$('evloc').value.trim(),att=$('evatt').value.trim(),proj=$('evp').value;if(!name||!date||!start||!end){$('evstat').textContent='NAME, DATE, START AND END REQUIRED';return}
-const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,project:proj,ts:Date.now(),status:'new'};
-if(fb){fb.child('dtools_events').push(rec);$('evstat').textContent='SENT TO FO. WILL BE IN D-TOOLS AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
+function submitAddEv(){const name=$('evname').value.trim(),date=$('evdate').value,start=$('evstart').value,end=$('evend').value,loc=$('evloc').value.trim(),att=$('evatt').value.trim();if(!name||!date||!start||!end){$('evstat').textContent='NAME, DATE, START AND END REQUIRED';return}
+const rec={name:name,date:date,start:start,end:end,location:loc,attendees:att,ts:Date.now(),status:'new'};
+if(fb){fb.child('evreq').push(rec);$('evstat').textContent='SENT TO FO. GOES ON YOUR GOOGLE CALENDAR AFTER THE NEXT SWEEP.';setTimeout(closeAddEv,1600)}else{$('evstat').textContent='OFFLINE: FIREBASE NOT CONNECTED, TRY AGAIN'}}
 
 /* SFX + QUICK NOTE (added Oct 27 2026) */
 let actx=null;
@@ -393,7 +393,7 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);scoreInit();const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v){localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur={};try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(!Array.isArray(r)&&r&&typeof r==='object')cur=r}catch(e){}Object.keys(v).forEach(k=>{if(!cur[k])cur[k]=Date.now()});localStorage.setItem(LSN+'memdel',JSON.stringify(cur));render()},e=>console.warn(e)),fb.child('pipe').on('value',s=>{const v=s.val()||{};window.PIPEFB=v;let ch=false;(DATA.pipe||[]).forEach(p=>{const q=v[(p.code||'').replace(/[\[\]$#\/\.]/g,'')];if(q&&q.stage&&q.stage!==p.stage){p.stage=q.stage;ch=true}});if(ch)renderPipe()},e=>console.warn(e)),fb.child('stagehist').on('value',s=>{window.SHIST=s.val()||{};renderPipe()},e=>console.warn(e))}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);scoreInit();const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v){localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur={};try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(!Array.isArray(r)&&r&&typeof r==='object')cur=r}catch(e){}Object.keys(v).forEach(k=>{if(!cur[k])cur[k]=Date.now()});localStorage.setItem(LSN+'memdel',JSON.stringify(cur));render()},e=>console.warn(e))}catch(e){console.warn(e)}}
 }
 function getMem(){let a=null;try{a=JSON.parse(localStorage.getItem(LSN+'mem'))}catch(e){}return(Array.isArray(a)?a:Object.values(a||{})).filter(m=>m&&(m.t||m.text||m.title))}
 function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb)fb.child('mem').set(list)}
@@ -466,7 +466,7 @@ function renderCal(){
 function renderDay(){if(!sel)return;
   const evs=(DATA.calendar||[]).filter(e=>e.date===sel);
   const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(sel+'T12:00').getDay()];
-  $('daylist').innerHTML='<b style="color:var(--yellow)">'+wd+' '+sel.slice(5)+'</b>'+(evs.length?'':' <span style="color:var(--dim)">- nothing scheduled</span>')+evs.map(e=>'<div class="ev"><span class="tm '+catOf(e)+'">'+esc(e.time||'All day')+'</span><span class="et '+catOf(e)+'">'+esc(e.title)+dtLink(e)+'</span></div>').join('');
+  $('daylist').innerHTML='<b style="color:var(--yellow)">'+wd+' '+sel.slice(5)+'</b>'+(evs.length?'':' <span style="color:var(--dim)">- nothing scheduled</span>')+evs.map(e=>'<div class="ev"><span class="tm '+catOf(e)+'">'+esc(e.time||'All day')+'</span><span class="et '+catOf(e)+'">'+esc(e.title)+'</span></div>').join('');
 }
 /* week ahead + forecast */
 /* tasks */
@@ -477,18 +477,16 @@ function scoreBump(){let s=null;try{s=JSON.parse(localStorage.getItem(LSN+'score
 function scoreInit(){if(!fb||!fb.child)return;fb.child('task_done').on('value',s=>{fbTD=s.val()||{};renderHud()},()=>{fbTD=null})}
 function renderTasks(){
   const now=new Date(),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const list=(DATA.tasks||[]).filter(t=>!isDone(t.n)&&t.cat!=='personal');
+  const list=(DATA.tasks||[]).filter(t=>!isDone(t.n));
   list.forEach(t=>{const d=tdue(t);t._k=d?d.getTime():9e9;t._od=!!d&&d<t0});
   list.sort((a,b)=>a._k-b._k);
   const w=list.length,tc=$('tcount');
-  if(tc)tc.textContent=list.length?list.length+' OPEN \u00b7 '+w+' WORK':'';
-  $('alltasks').innerHTML=list.length?list.map(x=>{const sp=memSplit(x.title);const det=(sp[1]?sp[1]+(x.detail?' \u2014 '+x.detail:''):x.detail);const tid='t'+x.n;const open=!!topen()[tid];const title=sp[1]?((open?'\u25be ':'\u25b8 ')+sp[0]):x.title;return '<div class="titem'+(x._od?' od':'')+(open?' open':'')+'" onclick="toggleTsk(\''+tid+'\')"><div class="pxbox" onclick="event.stopPropagation();setDone('+x.n+','+!isDone(x.n)+')"></div><div class="tt"><div class="ttitle '+(x.cat==='personal'?'cp':'cw')+'">'+esc(title)+'</div>'+((open&&det)?'<div class="tdetail">'+esc(det)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>'}).join(''):'<div class="tdetail">nothing here.</div>';
+  if(tc)tc.textContent=list.length?list.length+' OPEN':'';
+  $('alltasks').innerHTML=list.length?list.map(x=>{const sp=memSplit(x.title);const det=(sp[1]?sp[1]+(x.detail?' \u2014 '+x.detail:''):x.detail);const tid='t'+x.n;const open=!!topen()[tid];const title=sp[1]?((open?'\u25be ':'\u25b8 ')+sp[0]):x.title;return '<div class="titem'+(x._od?' od':'')+(open?' open':'')+'" onclick="toggleTsk(\''+tid+'\')"><div class="pxbox" onclick="event.stopPropagation();setDone('+x.n+','+!isDone(x.n)+')"></div><div class="tt"><div class="ttitle '+({fam:'cp',fin:'cg',rem:'cy'})[x.cat]||'cw'+'">'+esc(title)+'</div>'+((open&&det)?'<div class="tdetail">'+esc(det)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>'}).join(''):'<div class="tdetail">nothing here.</div>';
 }
 function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return (h>>>0).toString(36)}
 function topen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'topen')||'{}')}catch(e){}return o}
 function toggleTsk(id){sfx();const o=topen();o[id]=!o[id];localStorage.setItem(LSN+'topen',JSON.stringify(o));renderTasks()}
-function ropen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'ropen')||'{}')}catch(e){}return o}
-function toggleRamp(id){sfx();const o=ropen();o[id]=!o[id];localStorage.setItem(LSN+'ropen',JSON.stringify(o));renderRamp()}
 /* memorable */
 function memOpen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'memopen')||'{}')}catch(e){}return o}
 function toggleMem(id){const o=memOpen();o[id]=!o[id];localStorage.setItem(LSN+'memopen',JSON.stringify(o));renderMem()}
@@ -496,33 +494,35 @@ function memSplit(t){t=String(t||'');if(t.indexOf('NEW PROJECT: ')===0){const r=
 function renderMem(){
   let dels=[];try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(Array.isArray(r))dels=[];else{const now=Date.now();for(const k in r){if(now-(r[k]||0)<129600000)dels.push(k)}}}catch(e){}
   const seen={};let list=[];
-  (DATA.memorable||[]).forEach(m=>{if(m&&(m.t||m.text||m.title)&&!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
-  getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0&&(m.cat||'w')[0]!=='p'){seen[m.id]=1;list.push(m)}});
+  (DATA.memorable||[]).forEach(m=>{if(m&&(m.t||m.text||m.title)&&!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
+  getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
   const mc=$('mcount');if(mc)mc.textContent=list.length?list.length+' ITEMS':'';
   $('mems').innerHTML=list.map(m=>{const o=memOpen();const full=String(m.t||m.text||m.title||'');const sp=memSplit(full);const open=!!o[m.id];const chip=m.k==='new'?'y':((m.cat||'w')[0]);const lab=m.k==='new'?'NEW':'UPD';const title=(open&&!sp[1])?full:((open?'\u25be ':'\u25b8 ')+sp[0]);return '<div class="titem'+(open?' open':'')+'" onclick="toggleMem(\''+m.id+'\')"><div class="tt"><div class="ttitle '+(m.k==='new'?'cy mnew':chip)+'">'+esc(title)+'</div>'+((open&&sp[1])?'<div class="tdetail">'+esc(sp[1])+'</div>':'')+'</div><span class="x" onclick="event.stopPropagation();delMem(\''+m.id+'\')">X</span></div>'}).join('')||'<div class="tdetail">nothing here.</div>';
 }
 function delMem(id){let o={};try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(!Array.isArray(r)&&r&&typeof r==='object')o=r}catch(e){}o[id]=Date.now();localStorage.setItem(LSN+'memdel',JSON.stringify(o));setMem(getMem().filter(m=>m.id!==id));if(fb)fb.child('memdel').child(id).set(Date.now());renderMem()}
-function fmtUSD(n){return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function renderRamp(){
-  const r=DATA.ramp,fp=$('rampfunds'),bp=$('rampbills');
-  if(!r||!r.funds||!r.funds.length){fp.innerHTML='<div class="tdetail">no ramp data yet</div>';bp.innerHTML='';$('rampnote').textContent='';return}
-  fp.innerHTML=r.funds.map(f=>{const pct=f.limit?Math.min(100,Math.round(f.spent/f.limit*100)):0;const col=pct>=90?'var(--red)':pct>=75?'var(--yellow)':'var(--pink)';const left=f.limit-f.spent;return '<div class="rfund" title="spent '+fmtUSD(f.spent)+' of '+fmtUSD(f.limit)+'"><div class="rline"><span>'+esc(f.name)+'</span><span>'+fmtUSD(left)+' LEFT</span></div><div class="rbar"><div class="rfill" style="width:'+pct+'%;background:'+col+'"></div></div></div>'}).join('');
-  const items=r.items||[];
-  const ro=ropen();
-  bp.innerHTML=items.length?items.map(b=>{const nm=String(b.name||'');const ip=nm.indexOf(' (');const short=ip>0?nm.slice(0,ip):nm;const rest=ip>0?nm.slice(ip+1):'';const rid='r'+djb2(nm+'|'+(b.date||''));const open=!!ro[rid];const det=[rest,b.date||'',b.status||''].filter(Boolean).join(' \u00b7 ');return '<div class="rbill'+(open?' open':'')+'" onclick="toggleRamp(\''+rid+'\')"><div class="bwrap"><span class="bname">'+esc(short)+'</span>'+((open&&det)?'<span class="bdet">'+esc(det)+'</span>':'')+'</div><span class="bamt">'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>'}).join(''):'<div class="tdetail">nothing pending</div>';
-  $('rampnote').textContent='LIMITS LIVE FROM RAMP';
-}
-/* project pipeline (V16) */
-const STAGES=['NEW','PLANNING','SCHEDULED','IN PROGRESS','DELAYED','INSTALLED','COMPLETED'];
-function sCls(s){return s==='SCHEDULED'?'s':s==='IN PROGRESS'?'p':s==='DELAYED'?'u':(s==='NEW'||s==='PLANNING')?'q':'d'}
-function pFmt(s){if(!s)return'';const d=new Date(s+'T12:00:00');if(isNaN(d))return s;const W=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return W[d.getDay()]+' '+M[d.getMonth()]+' '+d.getDate()}
-function pMoney(v){return v==null||v===''||isNaN(Number(v))?'\u2014':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function mergePipeLocal(){try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');(DATA.pipe||[]).forEach(p=>{if(m[p.code])p.stage=m[p.code]})}catch(e){}}
-function renderPipe(){const el=$('pipelist');if(!el)return;mergePipeLocal();const MAP={QUOTED:'PLANNING','PUNCH LIST':'INSTALLED',DONE:'COMPLETED'};(DATA.pipe||[]).forEach(p=>{if(MAP[p.stage])p.stage=MAP[p.stage];if(!p.inst&&String(p.code).startsWith('JS-Dhablania'))p.inst='2026-11-09';if(p.stage==='INSTALLED'){let ia=p.installed_at||null;if(!ia){const _san=String(p.code).replace(/[\[\]$#\/\.]/g,'');if(typeof PIPEFB!=='undefined'&&PIPEFB&&PIPEFB[_san]&&PIPEFB[_san].stage==='INSTALLED'&&PIPEFB[_san].ts)ia=new Date(PIPEFB[_san].ts).toISOString().slice(0,10)}if(!ia){if(typeof SHIST!=='undefined'&&SHIST&&SHIST[_san]&&SHIST[_san].stage==='INSTALLED'&&SHIST[_san].since)ia=SHIST[_san].since}if(!ia)ia=new Date().toISOString().slice(0,10);p.installed_at=ia;if(new Date(ia+'T12:00:00').getTime()+30*864e5<=Date.now()){p.stage='COMPLETED';try{const _m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');_m[p.code]='COMPLETED';localStorage.setItem(LSN+'pstage',JSON.stringify(_m))}catch(e){}if(fb){try{fb.child('pipe').child(String(p.code).replace(/[\[\]$#\/\.]/g,'')).set({stage:'COMPLETED',ts:Date.now()})}catch(e){}}}}});const t0=new Date();t0.setHours(0,0,0,0);const arr=(DATA.pipe||[]).map(p=>{let d=null,dl=false;if(p.inst){d=new Date(p.inst+'T12:00:00');dl=!isNaN(d)&&d<t0&&p.stage!=='COMPLETED'&&p.stage!=='INSTALLED'}return Object.assign({d:d,dl:dl},p)});const srt=(a,b)=>a.d-b.d;const delayed=arr.filter(p=>p.dl).sort(srt);const up=arr.filter(p=>p.d&&!p.dl&&p.stage!=='COMPLETED').sort(srt);const nd=arr.filter(p=>!p.d&&p.stage!=='COMPLETED');const dn=arr.filter(p=>p.stage==='COMPLETED');const all=delayed.concat(up,nd,dn);const act=arr.filter(p=>p.stage!=='COMPLETED');const tot=act.reduce((s,p)=>s+(Number(p.value)||0),0);const n=$('pnote');if(n)n.textContent=(tot?'$'+tot.toLocaleString('en-US')+' PIPELINE \u00b7 ':'')+act.length+' ACTIVE'+(delayed.length?' \u00b7 '+delayed.length+' DELAYED':'');el.innerHTML=all.map(p=>{const san=String(p.code).replace(/[\[\]$#\/\.]/g,'');const subH=String(p.sub||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');let sh=(typeof SHIST!=='undefined'&&SHIST&&SHIST[san])||null;if((!sh||sh.stage!==p.stage)&&typeof PIPEFB!=='undefined'&&PIPEFB&&PIPEFB[san]&&PIPEFB[san].stage===p.stage&&PIPEFB[san].ts){sh={stage:p.stage,since:new Date(PIPEFB[san].ts).toISOString().slice(0,10)}}if(!sh||sh.stage!==p.stage){sh={stage:p.stage,since:new Date().toISOString().slice(0,10)};try{if(fb)fb.child('stagehist').child(san).set(sh)}catch(e){}}const dIn=Math.max(0,Math.floor((Date.now()-new Date(sh.since+'T12:00:00'))/864e5));const pdays='<span class="pdays'+(dIn>=14?' hot':'')+'" title="days in stage">'+dIn+'d</span>';let ptasks='';const ptk=p.tk||null;if(ptk&&((ptk.n||0)+(ptk.ip||0)+(ptk.c||0)+(ptk.t||0))>0){ptasks='<span class="ptasks">'+(ptk.n||0)+' new \u00b7 '+(ptk.ip||0)+' in progress \u00b7 '+(ptk.c||0)+' done'+(ptk.t?' \u00b7 <b class="tdn">'+(ptk.d||0)+'/'+ptk.t+'</b>':'')+'</span>'}else{const tk=p.t||null;if(tk&&((tk.a||0)+(tk.o||0)+(tk.c||0))>0){const tp=[];if(tk.o)tp.push('<b class="tov">'+tk.o+' OVERDUE</b>');if(tk.a)tp.push(tk.a+' OPEN');if(tk.c)tp.push('<b class="tdn">'+tk.c+' DONE</b>');ptasks='<span class="ptasks">T '+tp.join(' \u00b7 ')+'</span>'}}const esc=String(p.code).replace(/'/g,"\\'");const sel='<select class="psel s-'+sCls(p.stage)+'" style="width:calc(11ch + 28px);max-width:calc(11ch + 28px);flex:0 0 auto" onchange="setPipeStage(\''+esc+'\',this.value)">'+STAGES.map(s=>'<option'+(s===p.stage?' selected':'')+'>'+s+'</option>').join('')+'</select>';const inst=p.d?pFmt(p.inst)+(p.dl?' <b class="dtag">DELAYED</b>':''):'\u2014';const ass=p.assigned?pFmt(p.assigned):'\u2014';return '<div class="prow'+(p.stage==='COMPLETED'?' isdone':'')+(p.dl?' delayed':'')+(p.d&&!p.dl&&p.d.getTime()===t0.getTime()?' today':'')+'"><div class="pcrow">'+sel+pdays+'<span class="pins">'+inst+'</span></div><span class="pname">'+p.code+(p.name?' <i>'+p.name+'</i>':'')+'</span>'+(p.sub?'<span class="psub" title="'+subH+'">'+subH+'</span>':'')+'<span class="pmeta"><span class="passn">'+ass+'</span><span class="pval">'+pMoney(p.value)+'</span></span>'+(p.paid!=null?'<span class="plab"><span class="ppaid">PAID '+pMoney(p.paid)+'</span></span>':'')+ptasks+'</div>'}).join('')||'<div class="pempty">NO PROJECTS IN PIPELINE YET</div>'}
-function setPipeStage(code,stage){sfx();const p=(DATA.pipe||[]).find(x=>x.code===code);if(p)p.stage=stage;try{const m=JSON.parse(localStorage.getItem(LSN+'pstage')||'{}');m[code]=stage;localStorage.setItem(LSN+'pstage',JSON.stringify(m))}catch(e){}if(fb){try{fb.child('pipe').child(code.replace(/[\[\]$#\/\.]/g,'')).set({stage:stage,ts:Date.now()})}catch(e){}}renderPipe()}
 
-function pipeEnhance(){try{document.querySelectorAll('#pipelist .pname').forEach(function(pn){var t=(pn.textContent||'').trim();if(!t)return;var id=null,rep='';for(var k in DTP){if(t.indexOf(k)===0){id=DTP[k];break}}for(var r in REP){if(t.indexOf(r)===0){rep=REP[r];break}}if(id&&!pn.querySelector('a')){var a=document.createElement('a');a.className='plink';a.href='https://d-tools.cloud?payload=null&tenantId=11110&RedirectToEntity=Project&RedirectToId='+id;a.target='_blank';a.rel='noopener';a.innerHTML=pn.innerHTML;pn.textContent='';pn.appendChild(a)}if(rep&&!pn.parentNode.querySelector('.prep')){var s=document.createElement('span');s.className='prep';s.textContent='REP '+rep;pn.parentNode.insertBefore(s,pn.nextSibling)}})}catch(e){}}
-(function(){var _rp=renderPipe;renderPipe=function(){_rp();pipeEnhance()}})();
+function renderBills(){
+  const el=$('billslist');if(!el)return;
+  const list=(DATA.bills||[]).slice();
+  const now=new Date(),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  list.forEach(b=>{const d=tdue(b);b._k=d?d.getTime():9e9;b._od=!!d&&d<t0});
+  list.sort((a,b)=>a._k-b._k);
+  const od=list.filter(b=>b._od).length;
+  const n=$('bnote');if(n)n.textContent=(list.length+' TRACKED'+(od?' \u00b7 '+od+' OVERDUE':''));
+  el.innerHTML=list.map(b=>'<div class="rbill'+(b._od?' od':'')+'"><div class="bwrap"><span class="bname">'+esc(b.name)+'</span>'+(b.note?'<span class="bdet">'+esc(b.note)+'</span>':'')+'</div><span class="bamt">'+(b.amount!=null&&b.amount!==''?fmtUSD(b.amount):'&mdash;')+'</span></div>').join('')||'<div class="tdetail">nothing tracked</div>';
+}
+function renderFamily(){
+  const el=$('famlist');if(!el)return;
+  const list=(DATA.family||[]);
+  el.innerHTML=list.map(f=>'<div class="titem"><div class="tt"><div class="ttitle cf">'+esc(f.t||f.text||f.title||'')+'</div></div></div>').join('')||'<div class="tdetail">nothing on the family list</div>';
+}
+function renderSuggestions(){
+  const el=$('suglist');if(!el)return;
+  const list=(DATA.suggestions||[]);
+  el.innerHTML=list.map(s=>'<div class="prow sugrow"><span class="pname">'+esc(s.t||s.title||'SUGGESTION')+'</span>'+(s.note?'<span class="psub">'+esc(s.note)+'</span>':'')+'</div>').join('')||'<div class="pempty">NO SUGGESTIONS YET</div>';
+  const n=$('snote');if(n)n.textContent=list.length+' WAITING ON YOU';
+}
+function fmtUSD(n){return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fitBoard(){const b=document.querySelector('.board');if(!b)return;const mq=window.matchMedia('(min-width:700px) and (orientation:landscape)');b.style.gridTemplateRows=mq.matches?'minmax(0,1fr) minmax(0,1fr)':''}
 
 function fitScreen(){const app=$('app');if(!app||app.hidden)return;const b=document.querySelector('.board');const t=document.querySelector('#app .top');const mq=window.matchMedia('(min-width:700px) and (orientation:landscape)');const q=new URLSearchParams(location.search).get('fit');
@@ -534,7 +534,7 @@ window.addEventListener('resize',fitBoard);
 window.addEventListener('resize',fitScreen);
 window.addEventListener('orientationchange',function(){setTimeout(fitScreen,80)});
 document.addEventListener('fullscreenchange',fitScreen);
-function render(){renderCal();renderDay();renderTasks();renderMem();renderRamp();renderPipe();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16));fitBoard();fitScreen()}
+function render(){renderCal();renderDay();renderTasks();renderMem();renderBills();renderFamily();renderSuggestions();$('stamp').textContent='Data updated: '+((DATA.generated_at||'').replace('T',' ').slice(0,16));fitBoard();fitScreen()}
 render();renderHud();
 </script>
 </body>
