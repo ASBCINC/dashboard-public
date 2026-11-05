@@ -1003,7 +1003,7 @@ function fbInit(){
   if(!FB_CONFIG)return;
   const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';a.onload=loadDb;document.head.appendChild(a);
   function loadDb(){const b=document.createElement('script');b.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';b.onload=go;document.head.appendChild(b)}
-  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);scoreInit();const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('mem').on('value',s=>{const v=s.val();if(v){localStorage.setItem(LSN+'mem',JSON.stringify(v));render()}},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur={};try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(!Array.isArray(r)&&r&&typeof r==='object')cur=r}catch(e){}Object.keys(v).forEach(k=>{if(!cur[k])cur[k]=Date.now()});localStorage.setItem(LSN+'memdel',JSON.stringify(cur));render()},e=>console.warn(e))}catch(e){console.warn(e)}}
+  function go(){try{firebase.initializeApp(FB_CONFIG);fb=firebase.database().ref('dash/'+pin);scoreInit();const pre=LSN+'done_';fb.child('done').on('value',s=>{const v=s.val()||{};for(const k in v)localStorage.setItem(pre+k,v[k]?'1':'0');for(const k in localStorage)if(k.startsWith(pre)&&!(k.slice(pre.length) in v))localStorage.removeItem(k);render()},e=>console.warn(e));fb.child('memdel').on('value',s=>{const v=s.val()||{};let cur={};try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(!Array.isArray(r)&&r&&typeof r==='object')cur=r}catch(e){}Object.keys(v).forEach(k=>{if(!cur[k])cur[k]=Date.now()});localStorage.setItem(LSN+'memdel',JSON.stringify(cur));render()},e=>console.warn(e))}catch(e){console.warn(e)}}
 }
 function getMem(){let a=null;try{a=JSON.parse(localStorage.getItem(LSN+'mem'))}catch(e){}return(Array.isArray(a)?a:Object.values(a||{})).filter(m=>m&&(m.t||m.text||m.title))}
 function setMem(list){localStorage.setItem(LSN+'mem',JSON.stringify(list));if(fb)fb.child('mem').set(list)}
@@ -1092,7 +1092,7 @@ function renderTasks(){
   list.sort((a,b)=>a._k-b._k);
   const w=list.length,tc=$('tcount');
   if(tc)tc.textContent=list.length?list.length+' OPEN':'';
-  $('alltasks').innerHTML=list.length?list.map(x=>{const sp=memSplit(x.title);const det=(sp[1]?sp[1]+(x.detail?' \u2014 '+x.detail:''):x.detail);const tid='t'+x.n;const open=!!topen()[tid];const title=sp[1]?((open?'\u25be ':'\u25b8 ')+sp[0]):x.title;return '<div class="titem'+(x._od?' od':'')+(open?' open':'')+'" onclick="toggleTsk(\''+tid+'\')"><div class="pxbox" onclick="event.stopPropagation();setDone('+x.n+','+!isDone(x.n)+')"></div><div class="tt"><div class="ttitle '+({fam:'cp',fin:'cg',rem:'cy'})[x.cat]||'cw'+'">'+esc(title)+'</div>'+((open&&det)?'<div class="tdetail">'+esc(det)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>'}).join(''):'<div class="tdetail">nothing here.</div>';
+  $('alltasks').innerHTML=list.length?list.map(x=>{const sp=memSplit(x.title);const det=(sp[1]?sp[1]+(x.detail?' \u2014 '+x.detail:''):x.detail);const tid='t'+x.n;const open=!!topen()[tid];const title=sp[1]?((open?'\u25be ':'\u25b8 ')+sp[0]):x.title;return '<div class="titem'+(x._od?' od':'')+(open?' open':'')+'" onclick="toggleTsk(\''+tid+'\')"><div class="pxbox" onclick="event.stopPropagation();setDone('+x.n+','+!isDone(x.n)+')"></div><div class="tt"><div class="ttitle '+(({fam:'cp',fin:'cg',rem:'cy'})[x.cat]||'cw')+'">'+esc(title)+'</div>'+((open&&det)?'<div class="tdetail">'+esc(det)+'</div>':'')+'</div>'+(x.due?'<div class="tdue">'+esc(x.due)+'</div>':'')+'</div>'}).join(''):'<div class="tdetail">nothing here.</div>';
 }
 function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return (h>>>0).toString(36)}
 function topen(){let o={};try{o=JSON.parse(localStorage.getItem(LSN+'topen')||'{}')}catch(e){}return o}
@@ -1105,12 +1105,12 @@ function renderMem(){
   let dels=[];try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(Array.isArray(r))dels=[];else{const now=Date.now();for(const k in r){if(now-(r[k]||0)<129600000)dels.push(k)}}}catch(e){}
   const seen={};let list=[];
   (DATA.memorable||[]).forEach(m=>{if(m&&(m.t||m.text||m.title)&&!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
-  getMem().forEach(m=>{if(!seen[m.id]&&dels.indexOf(m.id)<0){seen[m.id]=1;list.push(m)}});
   const mc=$('mcount');if(mc)mc.textContent=list.length?list.length+' ITEMS':'';
   $('mems').innerHTML=list.map(m=>{const o=memOpen();const full=String(m.t||m.text||m.title||'');const sp=memSplit(full);const open=!!o[m.id];const chip=m.k==='new'?'y':((m.cat||'w')[0]);const lab=m.k==='new'?'NEW':'UPD';const title=(open&&!sp[1])?full:((open?'\u25be ':'\u25b8 ')+sp[0]);return '<div class="titem'+(open?' open':'')+'" onclick="toggleMem(\''+m.id+'\')"><div class="tt"><div class="ttitle '+(m.k==='new'?'cy mnew':chip)+'">'+esc(title)+'</div>'+((open&&sp[1])?'<div class="tdetail">'+esc(sp[1])+'</div>':'')+'</div><span class="x" onclick="event.stopPropagation();delMem(\''+m.id+'\')">X</span></div>'}).join('')||'<div class="tdetail">nothing here.</div>';
 }
 function delMem(id){let o={};try{const r=JSON.parse(localStorage.getItem(LSN+'memdel')||'{}');if(!Array.isArray(r)&&r&&typeof r==='object')o=r}catch(e){}o[id]=Date.now();localStorage.setItem(LSN+'memdel',JSON.stringify(o));setMem(getMem().filter(m=>m.id!==id));if(fb)fb.child('memdel').child(id).set(Date.now());renderMem()}
 
+function fmtUSD(n){return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function renderBills(){
   const el=$('billslist');if(!el)return;
   const list=(DATA.bills||[]).slice();
